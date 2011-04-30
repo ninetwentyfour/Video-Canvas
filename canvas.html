@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		#main{
+			width:650px;
+			margin:auto;
+		}
+		#canvas, #canvasSimpleColors, #canvasSimpleSizes, #canvasSimpleTools, #canvasSimpleOutline {
+			border: 1px solid #333333;
+			cursor: pointer;
+			height: 340px;
+			margin: auto;
+			position: absolute;
+			width: 640px;
+			z-index: 15;
+		}
+	</style>
+</head>
+<body>
+	<div id="main">
+		<ul class="toolList">
+			<li>Clear the canvas: <button type="button" id="clearCanvas">Clear</button></li>
+			<li><span class="highlight">Choose a color: </span><button type="button" id="choosePurpleColors">Purple</button><button type="button" id="chooseGreenColors">Green</button><button type="button" id="chooseYellowColors">Yellow</button><button type="button" id="chooseBrownColors">Brown</button></li>
+			<li><span class="highlight">Choose a size: </span><button type="button" id="chooseSmallSizes">Small</button><button type="button" id="chooseNormalSizes">Normal</button><button type="button" id="chooseLargeSizes">Large</button><button type="button" id="chooseHugeSizes">Huge</button></li>
+			<li><button type="button" id="chooseWhiteColors">Eraser</button></li>
+		</ul>
+	
+		<div id="canvasDiv"></div><!-- The div that becomes the canvas element-->
+		<video width="640" height="360" autobuffer="true" controls="true" poster="http://www.travisberry.com/html5video/videos/demo/demoani1-poster.jpg" id="video" tabindex="0"><br>
+			<source type="video/mp4; codecs=&quot;avc1.64001E, mp4a.40.2&quot;" src="http://www.travisberry.com/html5video/videos/demo/test11.mp4"></source><br>
+			<source type="video/3gpp; codecs=&quot;mp4v.20.8, samr&quot;" src="http://www.travisberry.com/html5video/videos/demo/demoforweb3-iPhone-cell.3gp"></source><br>
+			<source type="video/ogg; codecs=&quot;theora, vorbis&quot;" src="http://www.travisberry.com/html5video/videos/demo/demoforweb3.ogv"></source><br>
+			<object width="640" height="385"><param value="http://www.youtube.com/v/SK0DV8Jxams&amp;hl=en_US&amp;fs=1&amp;" name="movie"><param value="true" name="allowFullScreen"><param value="always" name="allowscriptaccess"><embed width="640" height="385" allowfullscreen="true" allowscriptaccess="always" type="application/x-shockwave-flash" src="http://www.youtube.com/v/SK0DV8Jxams&amp;hl=en_US&amp;fs=1&amp;"></object><br>
+		</video>
+		
+		
+		<div style="display: block;" id="buttoncontainer">
+			<input type="button" value="Save PNG" id="savepngbtn">
+			<input type="button" value="Convert to PNG" id="convertpngbtn">
+			<br>
+			<input type="button" value="Save BMP" id="savebmpbtn">
+			<input type="button" value="Convert to BMP" id="convertbmpbtn">
+			<br>
+			<input type="button" value="Save JPEG" id="savejpegbtn">
+			<input type="button" value="Convert to JPEG" id="convertjpegbtn">
+		</div>
+		<div style="display: none; font-style: italic;" id="textdownload">Now you can right click and download the image<br>
+			<input type="button" value="Reset" id="resetbtn">
+		</div>
+	</div>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="canvas2image.js"></script>
+	<script type="text/javascript" src="base64.js"></script>
+	<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+	<script>
+		//Declare four color variables: colorPurple, colorGreen, colorYellow, colorBrown with corresponding hex color values, 
+		//a variable to store the current color: curColor, and an array to match the chosen color when the user clicked the canvas clickColor.
+		//Create a cursor size as well.
+		var colorPurple = "#cb3594";
+		var colorGreen = "#659b41";
+		var colorYellow = "#ffcf33";
+		var colorBrown = "#986928";
+		var colorWhite = "#ffffff";
+
+		var curColor = colorPurple;
+		var clickColor = new Array();
+
+		var clickSize = new Array();
+		var curSize = "normal";
+		
+		//IE doesn't know what the canvas tag means, and if we used that in our markup, 
+		//IE would serve us an entree of error. Instead we create a canvas element in JavaScript and append it to our div we called canvasDiv.
+		var canvasWidth = 640;
+		var canvasHeight = 360;
+		var canvasDiv = document.getElementById('canvasDiv');
+		canvas = document.createElement('canvas');
+		canvas.setAttribute('width', canvasWidth);
+		canvas.setAttribute('height', canvasHeight);
+		canvas.setAttribute('id', 'canvas');
+		canvasDiv.appendChild(canvas);
+		if(typeof G_vmlCanvasManager != 'undefined') {
+			canvas = G_vmlCanvasManager.initElement(canvas);
+		}
+		context = canvas.getContext("2d");
+
+		//Mouse Down Event: When the user clicks on canvas we record the position in an array via the addClick function. 
+		//We set the boolean paint to true. Finally we update the canvas with the function redraw.
+		$('#canvas').mousedown(function(e){
+			var mouseX = e.pageX - this.offsetLeft;
+			var mouseY = e.pageY - this.offsetTop;
+		
+			paint = true;
+			addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+			redraw();
+		});
+		
+		//clear canvas on "Clear" button press
+		$('#clearCanvas').mousedown(function(e){
+			clickX = new Array();
+			clickY = new Array();
+			clickDrag = new Array();
+			clickColor = new Array();
+			clearCanvas();
+		});
+
+		//button mousedown events to select color and cursor size
+		$('#choosePurpleColors').mousedown(function(e){
+			curColor = colorPurple;
+		});
+		$('#chooseGreenColors').mousedown(function(e){
+			curColor = colorGreen;
+		});
+		$('#chooseYellowColors').mousedown(function(e){
+			curColor = colorYellow;
+		});
+		$('#chooseBrownColors').mousedown(function(e){
+			curColor = colorBrown;
+		});
+		$('#chooseWhiteColors').mousedown(function(e){
+			curColor = colorWhite;
+		});
+		$('#chooseSmallSizes').mousedown(function(e){
+			curSize = "small";
+		});
+		$('#chooseNormalSizes').mousedown(function(e){
+			curSize = "normal";
+		});
+		$('#chooseLargeSizes').mousedown(function(e){
+			curSize = "large";
+		});
+		$('#chooseHugeSizes').mousedown(function(e){
+			curSize = "huge";
+		});
+
+		//Mouse Move Event: Just like moving the tip of a marker on a sheet of paper, we want to draw on the canvas when our user is pressing down. 
+		//The boolean paint will let us know if the virtual marker is pressing down on the paper or not. 
+		//If paint is true, then we record the value. Then redraw.
+		$('#canvas').mousemove(function(e){
+			if(paint){
+				addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+				redraw();
+			}
+		});
+
+		//Mouse Up Event: Marker is off the paper; paint boolean will remember!
+		$('#canvas').mouseup(function(e){
+			paint = false;
+		});
+
+		//Mouse Leave Event: If the marker goes off the paper, then forget you!
+		$('#canvas').mouseleave(function(e){
+			paint = false;
+		});
+
+		//Here is the addClick function that will save the click position:
+		var clickX = new Array();
+		var clickY = new Array();
+		var clickDrag = new Array();
+		var paint;
+
+		function addClick(x, y, dragging){
+			clickX.push(x);
+			clickY.push(y);
+			clickDrag.push(dragging);
+			clickColor.push(curColor);
+			clickSize.push(curSize);
+		}
+
+		//The redraw function is where the magic happens. Each time the function is called the canvas is cleared and everything is redrawn. 
+		//We could be more efficient and redraw only certain aspects that have been changed, but let's keep it simple.
+		//We set a few stroke properties for the color, shape, and width. Then for every time we recorded as a marker on paper we are going to draw a line.
+		function redraw(){
+			canvas.width = canvas.width; // Clears the canvas
+			context.lineJoin = "round";
+			var radius = 5;
+			for(var i=0; i < clickX.length; i++){
+				if(clickSize[i] == "small"){
+					radius = 2;
+				}else if(clickSize[i] == "normal"){
+					radius = 5;
+				}else if(clickSize[i] == "large"){
+					radius = 10;
+				}else if(clickSize[i] == "huge"){
+					radius = 20;
+				}
+				context.beginPath();
+				if(clickDrag[i] && i){
+					context.moveTo(clickX[i-1], clickY[i-1]);
+				}else{
+					context.moveTo(clickX[i]-1, clickY[i]);
+				}
+				context.lineTo(clickX[i], clickY[i]);
+				context.closePath();
+				context.strokeStyle = clickColor[i];
+				context.lineWidth = radius;
+				context.stroke();
+			}
+		}
+
+		//clear canvas
+		function clearCanvas(){
+			context.fillStyle = '#ffffff'; // Work around for Chrome
+			context.fillRect(0, 0, canvasWidth, canvasHeight); // Fill in the canvas with white
+			canvas.width = canvas.width; // clears the canvas
+		}
+</script>
+
+<script>
+// returns "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt..."
+/* 
+ * Canvas2Image.saveAsXXXX = function(oCanvasElement, bReturnImgElement, iWidth, iHeight) { ... } 
+ */  
+  
+var oCanvas = document.getElementById("canvas");  
+
+function showDownloadText() {
+document.getElementById("buttoncontainer").style.display = "none";
+document.getElementById("textdownload").style.display = "block";
+}
+function hideDownloadText() {
+document.getElementById("buttoncontainer").style.display = "block";
+document.getElementById("textdownload").style.display = "none";
+}
+
+function convertCanvas(strType) {
+	if (strType == "PNG"){
+		var oImg = Canvas2Image.saveAsPNG(oCanvas, true);
+	}
+	if (strType == "BMP"){
+		var oImg = Canvas2Image.saveAsBMP(oCanvas, true);
+	}
+	if (strType == "JPEG"){
+		var oImg = Canvas2Image.saveAsJPEG(oCanvas, true);
+	}
+	if (!oImg) {
+		alert("Sorry, this browser is not capable of saving " + strType + " files!");
+		return false;
+	}
+	oImg.id = "canvasimage";
+	oImg.style.border = oCanvas.style.border;
+	oCanvas.parentNode.replaceChild(oImg, oCanvas);
+	showDownloadText();
+}
+function saveCanvas(pCanvas, strType) {
+	var bRes = false;
+	if (strType == "PNG"){
+		bRes = Canvas2Image.saveAsPNG(oCanvas);
+	}
+	if (strType == "BMP"){
+		bRes = Canvas2Image.saveAsBMP(oCanvas);
+	}
+	if (strType == "JPEG"){
+		bRes = Canvas2Image.saveAsJPEG(oCanvas);
+	}
+	if (!bRes) {
+		alert("Sorry, this browser is not capable of saving " + strType + " files!");
+		return false;
+	}
+}
+document.getElementById("savepngbtn").onclick = function() {
+	saveCanvas(oCanvas, "PNG");
+}
+document.getElementById("savebmpbtn").onclick = function() {
+	saveCanvas(oCanvas, "BMP");
+}
+document.getElementById("savejpegbtn").onclick = function() {
+	saveCanvas(oCanvas, "JPEG");
+}
+document.getElementById("convertpngbtn").onclick = function() {
+	convertCanvas("PNG");
+}
+document.getElementById("convertbmpbtn").onclick = function() {
+	convertCanvas("BMP");
+}
+document.getElementById("convertjpegbtn").onclick = function() {
+	convertCanvas("JPEG");
+}
+document.getElementById("resetbtn").onclick = function() {
+	var oImg = document.getElementById("canvasimage");
+	oImg.parentNode.replaceChild(oCanvas, oImg);
+	hideDownloadText();
+}
+</script>
+</body>
+
+</html>
