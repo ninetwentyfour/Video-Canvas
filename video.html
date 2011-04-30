@@ -74,6 +74,11 @@ References:
 		</div>
 	</div><!-- End #main -->
 	
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script><!-- Needed by player controls-->
+	<script type="text/javascript" src="js/canvas2image.js"></script><!-- Needed to save image to desktop-->
+	<script type="text/javascript" src="js/base64.js"></script><!-- Needed to save image to desktop-->
+	<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
 	<script>
 		//draw the video to a canvas element
 		document.addEventListener('DOMContentLoaded', function(){
@@ -95,11 +100,6 @@ References:
 			setTimeout(draw,20,v,c,w,h);
 		}
 	</script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script><!-- Needed by player controls-->
-	<script type="text/javascript" src="js/canvas2image.js"></script><!-- Needed to save image to desktop-->
-	<script type="text/javascript" src="js/base64.js"></script><!-- Needed to save image to desktop-->
-	<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
 	<script>
 		//Draw in canvas script
 		//Declare four color variables: colorPurple, colorGreen, colorYellow, colorBrown with corresponding hex color values, 
