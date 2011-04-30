@@ -32,14 +32,14 @@ References:
 			width:100%;
 		}
 	</style>
-	<link href="ghindaVideoPlayer.css" rel="stylesheet" type="text/css">
+	<link href="css/ghindaVideoPlayer.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 	<div id="main">
 		<canvas id="c"></canvas><!-- the canvas -->
 		<video width="640" height="360" autobuffer="true" controls="true" poster="http://www.travisberry.com/html5video/videos/demo/demoani1-poster.jpg" id="v" tabindex="0">
-			<source src="sintel-trailer.ogv" type='video/ogg; codecs="theora, vorbis"'>
-			<source src="sintel-trailer.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+			<source src="videos/sintel-trailer.ogv" type='video/ogg; codecs="theora, vorbis"'>
+			<source src="videos/sintel-trailer.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		</video>
 		<!-- The video controls-->
 		<div class="ghinda-video-controls">
@@ -97,8 +97,8 @@ References:
 	</script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script><!-- Needed by player controls-->
-	<script type="text/javascript" src="canvas2image.js"></script><!-- Needed to save image to desktop-->
-	<script type="text/javascript" src="base64.js"></script><!-- Needed to save image to desktop-->
+	<script type="text/javascript" src="js/canvas2image.js"></script><!-- Needed to save image to desktop-->
+	<script type="text/javascript" src="js/base64.js"></script><!-- Needed to save image to desktop-->
 	<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
 	<script>
 		//Draw in canvas script
@@ -247,7 +247,7 @@ References:
 			// $('#v').gVideo().pause();
 		}
 	</script>
-	<script src="jquery.ghindaVideoPlayer.js"></script><!-- Player controls script-->
+	<script src="js/jquery.ghindaVideoPlayer.js"></script><!-- Player controls script-->
 	<script>
 		//instantiate player controls
 		$(function() {
