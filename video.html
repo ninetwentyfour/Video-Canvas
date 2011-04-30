@@ -10,7 +10,8 @@ References:
 <head>
 	<style>
 		body {
-			background: black;
+			background: #111;
+			color:#eee;
 		}
 		#c {
 			width: 640px;
@@ -25,6 +26,10 @@ References:
 		#main{
 			width:650px;
 			margin:auto;
+		}
+		.toolList{
+			float:left;
+			width:100%;
 		}
 	</style>
 	<link href="ghindaVideoPlayer.css" rel="stylesheet" type="text/css">
@@ -54,7 +59,7 @@ References:
 			<li><button type="button" id="chooseWhiteColors">Eraser</button></li>
 		</ul>
 		<!-- Save image-->
-		<div style="display: block;" id="buttoncontainer">
+		<div style="display: block; float:left;" id="buttoncontainer">
 			<input type="button" value="Save PNG" id="savepngbtn">
 			<input type="button" value="Convert to PNG" id="convertpngbtn">
 			<br>
@@ -91,11 +96,12 @@ References:
 		}
 	</script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
-	<script src="jquery-ui-1.8.2.custom.min.js"></script>	
-	<script type="text/javascript" src="canvas2image.js"></script>
-	<script type="text/javascript" src="base64.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script><!-- Needed by player controls-->
+	<script type="text/javascript" src="canvas2image.js"></script><!-- Needed to save image to desktop-->
+	<script type="text/javascript" src="base64.js"></script><!-- Needed to save image to desktop-->
 	<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
 	<script>
+		//Draw in canvas script
 		//Declare four color variables: colorPurple, colorGreen, colorYellow, colorBrown with corresponding hex color values, 
 		//a variable to store the current color: curColor, and an array to match the chosen color when the user clicked the canvas clickColor.
 		//Create a cursor size as well.
@@ -241,87 +247,84 @@ References:
 			// $('#v').gVideo().pause();
 		}
 	</script>
-	<script src="jquery.ghindaVideoPlayer.js"></script>		
+	<script src="jquery.ghindaVideoPlayer.js"></script><!-- Player controls script-->
 	<script>
+		//instantiate player controls
 		$(function() {
 			$('#v').gVideo();		
 		});
 	</script>
 	<script>
-	// returns "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt..."
-	/* 
-	 * Canvas2Image.saveAsXXXX = function(oCanvasElement, bReturnImgElement, iWidth, iHeight) { ... } 
-	 */  
+		//save image to desktop
+		var oCanvas = document.getElementById("c");  
 
-	var oCanvas = document.getElementById("c");  
+		function showDownloadText() {
+		document.getElementById("buttoncontainer").style.display = "none";
+		document.getElementById("textdownload").style.display = "block";
+		}
+		function hideDownloadText() {
+		document.getElementById("buttoncontainer").style.display = "block";
+		document.getElementById("textdownload").style.display = "none";
+		}
 
-	function showDownloadText() {
-	document.getElementById("buttoncontainer").style.display = "none";
-	document.getElementById("textdownload").style.display = "block";
-	}
-	function hideDownloadText() {
-	document.getElementById("buttoncontainer").style.display = "block";
-	document.getElementById("textdownload").style.display = "none";
-	}
-
-	function convertCanvas(strType) {
-		if (strType == "PNG"){
-			var oImg = Canvas2Image.saveAsPNG(oCanvas, true);
+		function convertCanvas(strType) {
+			if (strType == "PNG"){
+				var oImg = Canvas2Image.saveAsPNG(oCanvas, true);
+			}
+			if (strType == "BMP"){
+				var oImg = Canvas2Image.saveAsBMP(oCanvas, true);
+			}
+			if (strType == "JPEG"){
+				var oImg = Canvas2Image.saveAsJPEG(oCanvas, true);
+			}
+			if (!oImg) {
+				alert("Sorry, this browser is not capable of saving " + strType + " files!");
+				return false;
+			}
+			oImg.id = "canvasimage";
+			oImg.style.border = oCanvas.style.border;
+			oCanvas.parentNode.replaceChild(oImg, oCanvas);
+			showDownloadText();
 		}
-		if (strType == "BMP"){
-			var oImg = Canvas2Image.saveAsBMP(oCanvas, true);
+		function saveCanvas(pCanvas, strType) {
+			var bRes = false;
+			if (strType == "PNG"){
+				bRes = Canvas2Image.saveAsPNG(oCanvas);
+			}
+			if (strType == "BMP"){
+				bRes = Canvas2Image.saveAsBMP(oCanvas);
+			}
+			if (strType == "JPEG"){
+				bRes = Canvas2Image.saveAsJPEG(oCanvas);
+			}
+			if (!bRes) {
+				alert("Sorry, this browser is not capable of saving " + strType + " files!");
+				return false;
+			}
 		}
-		if (strType == "JPEG"){
-			var oImg = Canvas2Image.saveAsJPEG(oCanvas, true);
+		document.getElementById("savepngbtn").onclick = function() {
+			saveCanvas(oCanvas, "PNG");
 		}
-		if (!oImg) {
-			alert("Sorry, this browser is not capable of saving " + strType + " files!");
-			return false;
+		document.getElementById("savebmpbtn").onclick = function() {
+			saveCanvas(oCanvas, "BMP");
 		}
-		oImg.id = "canvasimage";
-		oImg.style.border = oCanvas.style.border;
-		oCanvas.parentNode.replaceChild(oImg, oCanvas);
-		showDownloadText();
-	}
-	function saveCanvas(pCanvas, strType) {
-		var bRes = false;
-		if (strType == "PNG"){
-			bRes = Canvas2Image.saveAsPNG(oCanvas);
+		document.getElementById("savejpegbtn").onclick = function() {
+			saveCanvas(oCanvas, "JPEG");
 		}
-		if (strType == "BMP"){
-			bRes = Canvas2Image.saveAsBMP(oCanvas);
+		document.getElementById("convertpngbtn").onclick = function() {
+			convertCanvas("PNG");
 		}
-		if (strType == "JPEG"){
-			bRes = Canvas2Image.saveAsJPEG(oCanvas);
+		document.getElementById("convertbmpbtn").onclick = function() {
+			convertCanvas("BMP");
 		}
-		if (!bRes) {
-			alert("Sorry, this browser is not capable of saving " + strType + " files!");
-			return false;
+		document.getElementById("convertjpegbtn").onclick = function() {
+			convertCanvas("JPEG");
 		}
-	}
-	document.getElementById("savepngbtn").onclick = function() {
-		saveCanvas(oCanvas, "PNG");
-	}
-	document.getElementById("savebmpbtn").onclick = function() {
-		saveCanvas(oCanvas, "BMP");
-	}
-	document.getElementById("savejpegbtn").onclick = function() {
-		saveCanvas(oCanvas, "JPEG");
-	}
-	document.getElementById("convertpngbtn").onclick = function() {
-		convertCanvas("PNG");
-	}
-	document.getElementById("convertbmpbtn").onclick = function() {
-		convertCanvas("BMP");
-	}
-	document.getElementById("convertjpegbtn").onclick = function() {
-		convertCanvas("JPEG");
-	}
-	document.getElementById("resetbtn").onclick = function() {
-		var oImg = document.getElementById("canvasimage");
-		oImg.parentNode.replaceChild(oCanvas, oImg);
-		hideDownloadText();
-	}
+		document.getElementById("resetbtn").onclick = function() {
+			var oImg = document.getElementById("canvasimage");
+			oImg.parentNode.replaceChild(oCanvas, oImg);
+			hideDownloadText();
+		}
 	</script>
 </body>
 </html>
