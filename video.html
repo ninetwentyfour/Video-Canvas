@@ -236,6 +236,9 @@ References:
 			context.fillStyle = '#ffffff'; // Work around for Chrome
 			context.fillRect(0, 0, canvasWidth, canvasHeight); // Fill in the canvas with white
 			canvas.width = canvas.width; // clears the canvas
+			//now quickly restart and stop video so frame doesnt go black
+			// $('#v').gVideo().play();
+			// $('#v').gVideo().pause();
 		}
 	</script>
 	<script src="jquery.ghindaVideoPlayer.js"></script>		

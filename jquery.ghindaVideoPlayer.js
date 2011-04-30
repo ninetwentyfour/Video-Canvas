@@ -43,12 +43,38 @@
 			var gPlay = function() {
 				if($gVideo.attr('paused') == false) {
 					$gVideo[0].pause();					
-				} else {					
+				} else {
+					//clear the canvas so annotations dont reappear on pause and subsequent new draw
+					clickX = new Array();
+					clickY = new Array();
+					clickDrag = new Array();
+					clickColor = new Array();
+					clearCanvas();
+					//here will be some code to save the image to server
+					//start playing again					
 					$gVideo[0].play();				
+				}
+			};
+			//pause the video is it is playing and someone starts to draw anyway
+			var canvasPause = function() {
+				if($gVideo.attr('paused') == false) {
+					$gVideo[0].pause();					
+				} else {
+					//do nothing		
 				}
 			};
 			
 			$ghinda_play_btn.click(gPlay);
+			//quickly play and pause the video is the clear button is pressed. prevents black screen
+			$('#clearCanvas').click(function() {
+				$gVideo[0].play();
+				setTimeout ( function() { 
+					$gVideo[0].pause();
+				}, 10 );
+				//$gVideo[0].pause();
+			});
+			//when canvas is clicked pause video
+			$('#c').mousedown(canvasPause);
 			$gVideo.click(gPlay);
 			
 			$gVideo.bind('play', function() {
