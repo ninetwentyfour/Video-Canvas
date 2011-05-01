@@ -5,6 +5,7 @@ References:
 	http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/
 	http://dev.opera.com/articles/view/custom-html5-video-player-with-css3-and-jquery/
 	http://www.lutzroeder.com/html5/
+	http://jim.studt.net/canvastext/
 -->
 <!DOCTYPE html>
 <html>
@@ -35,8 +36,9 @@ References:
 	</style>
 	<link href="css/ghindaVideoPlayer.css" rel="stylesheet" type="text/css">
 </head>
-<body onload="document_load();">
+<body>
 	<div id="main">
+		<span id="testText">Video Write-On Annotations</span>
 		<canvas id="c"></canvas><!-- the canvas -->
 		<video width="640" height="360" autobuffer="true" controls="true" poster="http://www.travisberry.com/html5video/videos/demo/demoani1-poster.jpg" id="v" tabindex="0">
 			<source src="videos/sintel-trailer.ogv" type='video/ogg; codecs="theora, vorbis"'>
@@ -58,6 +60,7 @@ References:
 			<li><span class="highlight">Choose a color: </span><button type="button" id="choosePurpleColors">Purple</button><button type="button" id="chooseGreenColors">Green</button><button type="button" id="chooseYellowColors">Yellow</button><button type="button" id="chooseBrownColors">Brown</button></li>
 			<li><span class="highlight">Choose a size: </span><button type="button" id="chooseSmallSizes">Small</button><button type="button" id="chooseNormalSizes">Normal</button><button type="button" id="chooseLargeSizes">Large</button><button type="button" id="chooseHugeSizes">Huge</button></li>
 			<li><button type="button" id="chooseWhiteColors">Eraser</button></li>
+			<li><button type="button" id="chooseWhiteColors" onclick="writeText();">Text</button></li>
 		</ul>
 		<!-- Save image-->
 		<div style="display: block; float:left;" id="buttoncontainer">
@@ -91,44 +94,42 @@ References:
 	</script>
 	<script type="text/javascript" src="js/saveImage.min.js"></script>
 	
-	<script type="text/javascript" src="js/textEdit.js"></script>
-	<script type="text/javascript" src="js/javascript.js"></script>
+	<script type="text/javascript" src="js/text.js"></script>
 	<script type="text/javascript">
-	//<![CDATA[
-	function document_load()
-	{
-		var editor = new TextEditor(document.getElementById("c"));
-		editor.setTheme({ 
-			"font-family": "Menlo,Lucida Console,Courier New", 
-			"font-size": "13", 
-			// "background-color": "#22252A",
-			// "background-blur-color": "#000000",
-			// "selection-color": "#3C424C", 
-			// "selection-blur-color": "#33373F", 
-			"cursor-color": "#FFFFFF", 
-			"cursor-background-color": "#33373F",
-			"text-style": "#FFFFFF", 
-			"comment-style": "#AAAAAA italic",
-			"literal-style": "#997777",
-			"keyword-style": "#82A0C0",
-			"punctuation-style": "#888888",
-			"declaration-style": "#FFFFFF italic",
-			"error-style": "AA0000 bold" });
-		editor.setLanguage(new JavaScript());
-		editor.focus();
-
-		// var request = new XMLHttpRequest()
-		// request.open("GET", "js/TextEditor.js", true);
-		// request.onreadystatechange = function ()
-		// {
-		// 	if (request.readyState === 4)
-		// 	{
-		// 		editor.setText(request.responseText);
-		// 	}
-		// }
-		// request.send(null);
+	function writeText(){
+		$("#c").one('mousedown', function(e) {
+		  //alert('Handler for .click() called.');
+			var mouseX = e.pageX - this.offsetLeft + 456;
+			var mouseY = e.pageY - this.offsetTop;
+			//alert(mouseX);
+			var textArea = "<div id='textAreaPopUp' style='position:absolute;top:"+mouseY+"px;left:"+mouseX+"px;z-index:30;'><textarea id='textareaTest' style='width:100px;height:50px;'></textarea>";
+			var saveButton = "<input type='button' value='save' id='saveText' onclick='saveTextFromArea("+mouseY+","+mouseX+");'></div>";
+			var appendString = textArea + saveButton;
+			$("#main").append(appendString);
+		});
 	}
-	//]]>
+	function saveTextFromArea(y,x){
+		//get the value of the textarea then destroy it and the save button
+		var text = $('textarea#textareaTest').val();
+		$('textarea#textareaTest').remove();
+		$('#saveText').remove();
+		//get the canvas and add the text functions
+		var canvas = document.getElementById('c');
+		var ctx = canvas.getContext('2d');
+		// this adds the text functions to the ctx
+		CanvasTextFunctions.enable(ctx);
+		//set the font styles
+		var font = "sans";
+		var fontsize = 16;
+		ctx.strokeStyle = "rgba(205,205,205,1)";
+		//set the placement in the canvas
+		var topPlacement = y - $("#c").position().top;
+		var leftPlacement = x - $("#c").position().left;
+		//draw the text
+		ctx.drawText(font, fontsize, leftPlacement, topPlacement, text);
+		ctx.save();
+		ctx.restore();
+	}
 	</script>
 </body>
 </html>

@@ -1412,9 +1412,11 @@ TextEditor.prototype.update = function () {
                     top: parseFloat(this.theme["padding-top"])
                 };
             b = this.textModel.getTextRange();
-            b.start.line -= this.scrollPosition.line;
+            //b.start.line -= this.scrollPosition.line;
+			b.start.line -= 10;
             b.end.line -= this.scrollPosition.line;
-            b.start.column -= this.scrollPosition.column;
+            //b.start.column -= this.scrollPosition.column;
+			b.start.column -= 10;
             b.end.column -= this.scrollPosition.column;
             if (this.textModel.isCursor()) {
                 //this.context.fillStyle = this.theme["cursor-background-color"];
