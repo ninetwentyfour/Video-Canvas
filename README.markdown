@@ -21,13 +21,15 @@ Add markers to timeline
 
 Load saved files and overlay on video
 
-Type text on video in the same vein as drawing.
+<del>Type text on video in the same vein as drawing.</del>
 
 Share connection and drawing between accounts and people connected live.
 
 Show poster frame.
 
 Improve clear function and timeout of pause. Shouldnt skip time at all.
+
+Wrap text at a certain box size.
 
 Disclaimer:
 ===========
