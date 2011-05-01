@@ -25,6 +25,8 @@ Type text on video in the same vein as drawing.
 
 Share connection and drawing between accounts and people connected live.
 
+Show poster frame.
+
 Disclaimer:
 ===========
 I'm in no way responsible for anything you do with this. If this breaks anything of yours, I'm not responsible for that either.
