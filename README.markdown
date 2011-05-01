@@ -27,6 +27,8 @@ Share connection and drawing between accounts and people connected live.
 
 Show poster frame.
 
+Improve clear function and timeout of pause. Shouldnt skip time at all.
+
 Disclaimer:
 ===========
 I'm in no way responsible for anything you do with this. If this breaks anything of yours, I'm not responsible for that either.
