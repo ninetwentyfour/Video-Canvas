@@ -35,7 +35,7 @@ References:
 	</style>
 	<link href="css/ghindaVideoPlayer.css" rel="stylesheet" type="text/css">
 </head>
-<body>
+<body onload="document_load();">
 	<div id="main">
 		<canvas id="c"></canvas><!-- the canvas -->
 		<video width="640" height="360" autobuffer="true" controls="true" poster="http://www.travisberry.com/html5video/videos/demo/demoani1-poster.jpg" id="v" tabindex="0">
@@ -90,5 +90,45 @@ References:
 		});
 	</script>
 	<script type="text/javascript" src="js/saveImage.min.js"></script>
+	
+	<script type="text/javascript" src="js/textEdit.js"></script>
+	<script type="text/javascript" src="js/javascript.js"></script>
+	<script type="text/javascript">
+	//<![CDATA[
+	function document_load()
+	{
+		var editor = new TextEditor(document.getElementById("c"));
+		editor.setTheme({ 
+			"font-family": "Menlo,Lucida Console,Courier New", 
+			"font-size": "13", 
+			// "background-color": "#22252A",
+			// "background-blur-color": "#000000",
+			// "selection-color": "#3C424C", 
+			// "selection-blur-color": "#33373F", 
+			"cursor-color": "#FFFFFF", 
+			"cursor-background-color": "#33373F",
+			"text-style": "#FFFFFF", 
+			"comment-style": "#AAAAAA italic",
+			"literal-style": "#997777",
+			"keyword-style": "#82A0C0",
+			"punctuation-style": "#888888",
+			"declaration-style": "#FFFFFF italic",
+			"error-style": "AA0000 bold" });
+		editor.setLanguage(new JavaScript());
+		editor.focus();
+
+		// var request = new XMLHttpRequest()
+		// request.open("GET", "js/TextEditor.js", true);
+		// request.onreadystatechange = function ()
+		// {
+		// 	if (request.readyState === 4)
+		// 	{
+		// 		editor.setText(request.responseText);
+		// 	}
+		// }
+		// request.send(null);
+	}
+	//]]>
+	</script>
 </body>
 </html>
