@@ -99,7 +99,8 @@ References:
 	function writeText(){
 		$("#c").one('mousedown', function(e) {
 		  //alert('Handler for .click() called.');
-			var mouseX = e.pageX - this.offsetLeft + 456;
+			//var mouseX = e.pageX - this.offsetLeft + 456;
+			var mouseX = e.pageX - this.offsetLeft + $("#c").position().left;
 			var mouseY = e.pageY - this.offsetTop;
 			//alert(mouseX);
 			var textArea = "<div id='textAreaPopUp' style='position:absolute;top:"+mouseY+"px;left:"+mouseX+"px;z-index:30;'><textarea id='textareaTest' style='width:100px;height:50px;'></textarea>";
@@ -121,7 +122,11 @@ References:
 		//set the font styles
 		var font = "sans";
 		var fontsize = 16;
-		ctx.strokeStyle = "rgba(205,205,205,1)";
+		ctx.strokeStyle = "rgba(237,229,0,1)";
+		ctx.shadowOffsetX = 2;
+		ctx.shadowOffsetY = 2;
+		ctx.shadowBlur = 1;
+		ctx.shadowColor = "rgba(0,0,0,1)"
 		//set the placement in the canvas
 		var topPlacement = y - $("#c").position().top;
 		var leftPlacement = x - $("#c").position().left;
