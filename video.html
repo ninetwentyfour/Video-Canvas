@@ -97,12 +97,11 @@ References:
 	<script type="text/javascript" src="js/text.js"></script>
 	<script type="text/javascript">
 	function writeText(){
+		//steal the mousedown event for the canvas for one time
 		$("#c").one('mousedown', function(e) {
-		  //alert('Handler for .click() called.');
-			//var mouseX = e.pageX - this.offsetLeft + 456;
 			var mouseX = e.pageX - this.offsetLeft + $("#c").position().left;
 			var mouseY = e.pageY - this.offsetTop;
-			//alert(mouseX);
+			//append a text area box to the canvas where the user clicked to enter in a comment
 			var textArea = "<div id='textAreaPopUp' style='position:absolute;top:"+mouseY+"px;left:"+mouseX+"px;z-index:30;'><textarea id='textareaTest' style='width:100px;height:50px;'></textarea>";
 			var saveButton = "<input type='button' value='save' id='saveText' onclick='saveTextFromArea("+mouseY+","+mouseX+");'></div>";
 			var appendString = textArea + saveButton;
