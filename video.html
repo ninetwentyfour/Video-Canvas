@@ -126,7 +126,7 @@ References:
 		ctx.shadowOffsetX = 2;
 		ctx.shadowOffsetY = 2;
 		ctx.shadowBlur = 1;
-		ctx.shadowColor = "rgba(0,0,0,1)"
+		ctx.shadowColor = "rgba(0,0,0,1)";
 		//set the placement in the canvas
 		var topPlacement = y - $("#c").position().top;
 		var leftPlacement = x - $("#c").position().left;
@@ -134,6 +134,12 @@ References:
 		ctx.drawText(font, fontsize, leftPlacement, topPlacement, text);
 		ctx.save();
 		ctx.restore();
+		
+		//reset the drop shadow so marker lines dont have them
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
+		ctx.shadowBlur = 0;
+		ctx.shadowColor = "rgba(0,0,0,0)";
 	}
 	</script>
 </body>
