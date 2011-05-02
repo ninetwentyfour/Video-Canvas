@@ -27,9 +27,11 @@ Share connection and drawing between accounts and people connected live.
 
 Show poster frame.
 
-Improve clear function and timeout of pause. Shouldnt skip time at all.
+Improve clear function and timeout of pause. Shouldn't skip time at all.
 
-Wrap text at a certain box size.
+<del>Wrap text at a certain box size.</del>
+
+Add text box for people to enter in the width of the text box they are adding.
 
 Disclaimer:
 ===========
