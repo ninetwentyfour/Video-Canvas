@@ -25,7 +25,7 @@ Load saved files and overlay on video
 
 Share connection and drawing between accounts and people connected live.
 
-Show poster frame.
+<del>Show poster frame.</del>
 
 Improve clear function and timeout of pause. Shouldn't skip time at all.
 

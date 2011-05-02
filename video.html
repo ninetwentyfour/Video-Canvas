@@ -175,5 +175,18 @@ References:
 		return phraseArray;
 	}
 	</script>
+	
+	<script>
+	//load the poster image
+	$(window).load(function () {
+		var canvas = document.getElementById("c");
+		var context = canvas.getContext("2d");
+		// create a new "image" set the source the same as the poster attr in the video
+		var poster = new Image();
+		poster.src = $('video').attr('poster');
+		//draw the "image" to the canvas
+		context.drawImage(poster, 0, 0);
+	});
+	</script>
 </body>
 </html>
