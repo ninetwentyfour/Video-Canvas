@@ -39,6 +39,10 @@ Add cancel button to text add.
 
 Erase of drawings.
 
+Select color with color wheel and size of text.
+
+Select color of marker with color wheel. Offer demonstration of brush sizes, possibly change with slider.
+
 Disclaimer:
 ===========
 I'm in no way responsible for anything you do with this. If this breaks anything of yours, I'm not responsible for that either.
