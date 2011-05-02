@@ -121,19 +121,20 @@ References:
 		// this adds the text functions to the ctx
 		CanvasTextFunctions.enable(ctx);
 		var counter = 0;
+		//set the font styles
+		var font = "sans";
+		var fontsize = 16;
+		ctx.strokeStyle = "rgba(237,229,0,1)";
+		ctx.shadowOffsetX = 2;
+		ctx.shadowOffsetY = 2;
+		ctx.shadowBlur = 1;
+		ctx.shadowColor = "rgba(0,0,0,1)";
 		//draw each phrase to the screen, making the top position 20px more each time so it appears there are line breaks
-		jQuery.each(phraseArray, function() {
-			//set the font styles
-			var font = "sans";
-			var fontsize = 16;
-			ctx.strokeStyle = "rgba(237,229,0,1)";
-			ctx.shadowOffsetX = 2;
-			ctx.shadowOffsetY = 2;
-			ctx.shadowBlur = 1;
-			ctx.shadowColor = "rgba(0,0,0,1)";
+		$.each(phraseArray, function() {
 			//set the placement in the canvas
+			var lineheight = fontsize * 1.5;
 			var newline = ++counter;
-			newline = newline * 20;
+			newline = newline * lineheight;
 			var topPlacement = y - $("#c").position().top + newline;
 			var leftPlacement = x - $("#c").position().left;
 			text = this;
@@ -141,16 +142,16 @@ References:
 			ctx.drawText(font, fontsize, leftPlacement, topPlacement, text);
 			ctx.save();
 			ctx.restore();
-
-			//reset the drop shadow so marker lines dont have them
-			ctx.shadowOffsetX = 0;
-			ctx.shadowOffsetY = 0;
-			ctx.shadowBlur = 0;
-			ctx.shadowColor = "rgba(0,0,0,0)";
 		});
+		//reset the drop shadow so marker lines dont have them
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
+		ctx.shadowBlur = 0;
+		ctx.shadowColor = "rgba(0,0,0,0)";
 	}
 	
 	function getLines(ctx,phrase,maxPxLength) {
+		//break the text area text into lines based on "box" width
 		var wa=phrase.split(" "),
 		phraseArray=[],
 		lastPhrase="",
