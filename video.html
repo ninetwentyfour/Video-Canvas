@@ -116,29 +116,62 @@ References:
 		//get the canvas and add the text functions
 		var canvas = document.getElementById('c');
 		var ctx = canvas.getContext('2d');
+		//break the text into arrays based on a text width of 100px
+		var phraseArray = getLines(ctx,text,100);
 		// this adds the text functions to the ctx
 		CanvasTextFunctions.enable(ctx);
-		//set the font styles
-		var font = "sans";
-		var fontsize = 16;
-		ctx.strokeStyle = "rgba(237,229,0,1)";
-		ctx.shadowOffsetX = 2;
-		ctx.shadowOffsetY = 2;
-		ctx.shadowBlur = 1;
-		ctx.shadowColor = "rgba(0,0,0,1)";
-		//set the placement in the canvas
-		var topPlacement = y - $("#c").position().top;
-		var leftPlacement = x - $("#c").position().left;
-		//draw the text
-		ctx.drawText(font, fontsize, leftPlacement, topPlacement, text);
-		ctx.save();
-		ctx.restore();
-		
-		//reset the drop shadow so marker lines dont have them
-		ctx.shadowOffsetX = 0;
-		ctx.shadowOffsetY = 0;
-		ctx.shadowBlur = 0;
-		ctx.shadowColor = "rgba(0,0,0,0)";
+		var counter = 0;
+		//draw each phrase to the screen, making the top position 20px more each time so it appears there are line breaks
+		jQuery.each(phraseArray, function() {
+			//set the font styles
+			var font = "sans";
+			var fontsize = 16;
+			ctx.strokeStyle = "rgba(237,229,0,1)";
+			ctx.shadowOffsetX = 2;
+			ctx.shadowOffsetY = 2;
+			ctx.shadowBlur = 1;
+			ctx.shadowColor = "rgba(0,0,0,1)";
+			//set the placement in the canvas
+			var newline = ++counter;
+			newline = newline * 20;
+			var topPlacement = y - $("#c").position().top + newline;
+			var leftPlacement = x - $("#c").position().left;
+			text = this;
+			//draw the text
+			ctx.drawText(font, fontsize, leftPlacement, topPlacement, text);
+			ctx.save();
+			ctx.restore();
+
+			//reset the drop shadow so marker lines dont have them
+			ctx.shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			ctx.shadowBlur = 0;
+			ctx.shadowColor = "rgba(0,0,0,0)";
+		});
+	}
+	
+	function getLines(ctx,phrase,maxPxLength) {
+		var wa=phrase.split(" "),
+		phraseArray=[],
+		lastPhrase="",
+		l=maxPxLength,
+		measure=0;
+		ctx.font = "16px sans-serif";
+		for (var i=0;i<wa.length;i++) {
+			var w=wa[i];
+			measure=ctx.measureText(lastPhrase+w).width;
+			if (measure<l) {
+				lastPhrase+=(" "+w);
+			}else {
+				phraseArray.push(lastPhrase);
+				lastPhrase=w;
+			}
+			if (i===wa.length-1) {
+				phraseArray.push(lastPhrase);
+				break;
+			}
+		}
+		return phraseArray;
 	}
 	</script>
 </body>
