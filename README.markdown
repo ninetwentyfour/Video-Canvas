@@ -35,6 +35,10 @@ Add text box for people to enter in the width of the text box they are adding.
 
 Add back IE check and canvas hack.
 
+Add cancel button to text add.
+
+Erase of drawings.
+
 Disclaimer:
 ===========
 I'm in no way responsible for anything you do with this. If this breaks anything of yours, I'm not responsible for that either.
