@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>excanvas.js</title>
+  <link rel="stylesheet" href="http://github.com/jashkenas/docco/raw/0.3.0/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="base64.html">base64.js</a>
+          <a class="source" href="canvas2image.html">canvas2image.js</a>
+          <a class="source" href="excanvas.html">excanvas.js</a>
+          <a class="source" href="jquery.ghindaVideoPlayer.html">jquery.ghindaVideoPlayer.js</a>
+          <a class="source" href="text.html">text.js</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>excanvas.js</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="sr">//</span> <span class="no">Copyright</span> <span class="mi">2006</span> <span class="no">Google</span> <span class="no">Inc</span><span class="o">.</span><span class="sr"></span>
+<span class="sr">//</span>
+<span class="sr">/</span><span class="o">/</span> <span class="no">Licensed</span> <span class="n">under</span> <span class="n">the</span> <span class="no">Apache</span> <span class="no">License</span><span class="p">,</span> <span class="no">Version</span> <span class="mi">2</span><span class="o">.</span><span class="mi">0</span> <span class="p">(</span><span class="n">the</span> <span class="s2">&quot;License&quot;</span><span class="p">);</span><span class="sr"></span>
+<span class="sr">// you may not use this file except in compliance with the License.</span>
+<span class="sr">/</span><span class="o">/</span> <span class="no">You</span> <span class="n">may</span> <span class="n">obtain</span> <span class="n">a</span> <span class="n">copy</span> <span class="n">of</span> <span class="n">the</span> <span class="no">License</span> <span class="n">at</span><span class="sr"></span>
+<span class="sr">//</span>
+<span class="sr">/</span><span class="o">/</span>   <span class="n">http</span><span class="ss">:/</span><span class="o">/</span><span class="n">www</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">licenses</span><span class="o">/</span><span class="no">LICENSE</span><span class="o">-</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span>
+<span class="o">//</span><span class="sr"></span>
+<span class="sr">// Unless required by applicable law or agreed to in writing, software</span>
+<span class="sr">/</span><span class="o">/</span> <span class="n">distributed</span> <span class="n">under</span> <span class="n">the</span> <span class="no">License</span> <span class="n">is</span> <span class="n">distributed</span> <span class="n">on</span> <span class="n">an</span> <span class="s2">&quot;AS IS&quot;</span> <span class="no">BASIS</span><span class="p">,</span><span class="sr"></span>
+<span class="sr">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sr">/</span><span class="o">/</span> <span class="no">See</span> <span class="n">the</span> <span class="no">License</span> <span class="k">for</span> <span class="n">the</span> <span class="n">specific</span> <span class="n">language</span> <span class="n">governing</span> <span class="n">permissions</span> <span class="ow">and</span><span class="sr"></span>
+<span class="sr">// limitations under the License.</span>
+
+
+<span class="sr">/</span><span class="o">/</span> <span class="no">Known</span> <span class="no">Issues</span><span class="p">:</span><span class="sr"></span>
+<span class="sr">//</span>
+<span class="sr">/</span><span class="o">/</span> <span class="o">*</span> <span class="no">Patterns</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">implemented</span><span class="o">.</span><span class="sr"></span>
+<span class="sr">// * Radial gradient are not implemented. The VML version of these look very</span>
+<span class="sr">/</span><span class="o">/</span>   <span class="n">different</span> <span class="n">from</span> <span class="n">the</span> <span class="n">canvas</span> <span class="n">one</span><span class="o">.</span><span class="sr"></span>
+<span class="sr">// * Clipping paths are not implemented.</span>
+<span class="sr">/</span><span class="o">/</span> <span class="o">*</span> <span class="no">Coordsize</span><span class="o">.</span> <span class="no">The</span> <span class="n">width</span> <span class="ow">and</span> <span class="n">height</span> <span class="n">attribute</span> <span class="n">have</span> <span class="n">higher</span> <span class="n">priority</span> <span class="n">than</span> <span class="n">the</span><span class="sr"></span>
+<span class="sr">//   width and height style values which isn&#39;t correct.</span>
+<span class="sr">/</span><span class="o">/</span> <span class="o">*</span> <span class="no">Painting</span> <span class="n">mode</span> <span class="n">isn</span><span class="s1">&#39;t implemented.</span>
+<span class="s1">// * Canvas width/height should is using content-box by default. IE in</span>
+<span class="s1">//   Quirks mode will draw the canvas using border-box. Either change your</span>
+<span class="s1">//   doctype to HTML5</span>
+<span class="s1">//   (http://www.whatwg.org/specs/web-apps/current-work/#the-doctype)</span>
+<span class="s1">//   or use Box Sizing Behavior from WebFX</span>
+<span class="s1">//   (http://webfx.eae.net/dhtml/boxsizing/boxsizing.html)</span>
+<span class="s1">// * Non uniform scaling does not correctly scale strokes.</span>
+<span class="s1">// * Optimize. There is always room for speed improvements.</span>
+
+<span class="s1">// Only add this code if we do not already have a canvas implementation</span>
+<span class="s1">if (!document.createElement(&#39;</span><span class="n">canvas</span><span class="s1">&#39;).getContext) {</span>
+
+<span class="s1">(function() {</span>
+
+<span class="s1">  // alias some functions to make (compiled) code shorter</span>
+<span class="s1">  var m = Math;</span>
+<span class="s1">  var mr = m.round;</span>
+<span class="s1">  var ms = m.sin;</span>
+<span class="s1">  var mc = m.cos;</span>
+<span class="s1">  var abs = m.abs;</span>
+<span class="s1">  var sqrt = m.sqrt;</span>
+
+<span class="s1">  // this is used for sub pixel precision</span>
+<span class="s1">  var Z = 10;</span>
+<span class="s1">  var Z2 = Z / 2;</span>
+
+<span class="s1">  /**</span>
+<span class="s1">   * This funtion is assigned to the &lt;canvas&gt; elements as element.getContext().</span>
+<span class="s1">   * @this {HTMLElement}</span>
+<span class="s1">   * @return {CanvasRenderingContext2D_}</span>
+<span class="s1">   */</span>
+<span class="s1">  function getContext() {</span>
+<span class="s1">    return this.context_ ||</span>
+<span class="s1">        (this.context_ = new CanvasRenderingContext2D_(this));</span>
+<span class="s1">  }</span>
+
+<span class="s1">  var slice = Array.prototype.slice;</span>
+
+<span class="s1">  /**</span>
+<span class="s1">   * Binds a function to an object. The returned function will always use the</span>
+<span class="s1">   * passed in {@code obj} as {@code this}.</span>
+<span class="s1">   *</span>
+<span class="s1">   * Example:</span>
+<span class="s1">   *</span>
+<span class="s1">   *   g = bind(f, obj, a, b)</span>
+<span class="s1">   *   g(c, d) // will do f.call(obj, a, b, c, d)</span>
+<span class="s1">   *</span>
+<span class="s1">   * @param {Function} f The function to bind the object to</span>
+<span class="s1">   * @param {Object} obj The object that should act as this when the function</span>
+<span class="s1">   *     is called</span>
+<span class="s1">   * @param {*} var_args Rest arguments that will be used as the initial</span>
+<span class="s1">   *     arguments when the function is called</span>
+<span class="s1">   * @return {Function} A new function that has bound this</span>
+<span class="s1">   */</span>
+<span class="s1">  function bind(f, obj, var_args) {</span>
+<span class="s1">    var a = slice.call(arguments, 2);</span>
+<span class="s1">    return function() {</span>
+<span class="s1">      return f.apply(obj, a.concat(slice.call(arguments)));</span>
+<span class="s1">    };</span>
+<span class="s1">  }</span>
+
+<span class="s1">  var G_vmlCanvasManager_ = {</span>
+<span class="s1">    init: function(opt_doc) {</span>
+<span class="s1">      if (/MSIE/.test(navigator.userAgent) &amp;&amp; !window.opera) {</span>
+<span class="s1">        var doc = opt_doc || document;</span>
+<span class="s1">        // Create a dummy element so that IE will allow canvas elements to be</span>
+<span class="s1">        // recognized.</span>
+<span class="s1">        doc.createElement(&#39;</span><span class="n">canvas</span><span class="s1">&#39;);</span>
+<span class="s1">        doc.attachEvent(&#39;</span><span class="n">onreadystatechange</span><span class="s1">&#39;, bind(this.init_, this, doc));</span>
+<span class="s1">      }</span>
+<span class="s1">    },</span>
+
+<span class="s1">    init_: function(doc) {</span>
+<span class="s1">      // create xmlns</span>
+<span class="s1">      if (!doc.namespaces[&#39;</span><span class="n">g_vml_</span><span class="s1">&#39;]) {</span>
+<span class="s1">        doc.namespaces.add(&#39;</span><span class="n">g_vml_</span><span class="s1">&#39;, &#39;</span><span class="n">urn</span><span class="ss">:schemas</span><span class="o">-</span><span class="n">microsoft</span><span class="o">-</span><span class="n">com</span><span class="ss">:vml</span><span class="s1">&#39;,</span>
+<span class="s1">                           &#39;</span><span class="c1">#default#VML&#39;);</span>
+
+      <span class="p">}</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">doc</span><span class="o">.</span><span class="n">namespaces</span><span class="o">[</span><span class="s1">&#39;g_o_&#39;</span><span class="o">]</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">doc</span><span class="o">.</span><span class="n">namespaces</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;g_o_&#39;</span><span class="p">,</span> <span class="s1">&#39;urn:schemas-microsoft-com:office:office&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;#default#VML&#39;</span><span class="p">);</span>
+      <span class="p">}</span><span class="sr"></span>
+
+<span class="sr">      // Setup default CSS.  Only add one style sheet per document</span>
+<span class="sr">      if (!doc.styleSheets[&#39;ex_canvas_&#39;]) {</span>
+<span class="sr">        var ss = doc.createStyleSheet();</span>
+<span class="sr">        ss.owningElement.id = &#39;ex_canvas_&#39;;</span>
+<span class="sr">        ss.cssText = &#39;canvas{display:inline-block;overflow:hidden;&#39; +</span>
+<span class="sr">            /</span><span class="o">/</span> <span class="n">default</span> <span class="n">size</span> <span class="n">is</span> <span class="mi">300</span><span class="n">x150</span> <span class="k">in</span> <span class="no">Gecko</span> <span class="ow">and</span> <span class="no">Opera</span>
+            <span class="s1">&#39;text-align:left;width:300px;height:150px}&#39;</span> <span class="o">+</span>
+            <span class="s1">&#39;g_vml_\\:*{behavior:url(#default#VML)}&#39;</span> <span class="o">+</span>
+            <span class="s1">&#39;g_o_\\:*{behavior:url(#default#VML)}&#39;</span><span class="p">;</span>
+
+      <span class="p">}</span><span class="sr"></span>
+
+<span class="sr">      // find all canvas elements</span>
+<span class="sr">      var els = doc.getElementsByTagName(&#39;canvas&#39;);</span>
+<span class="sr">      for (var i = 0; i &lt; els.length; i++) {</span>
+<span class="sr">        this.initElement(els[i]);</span>
+<span class="sr">      }</span>
+<span class="sr">    },</span>
+
+<span class="sr">    /</span><span class="o">**</span>
+     <span class="o">*</span> <span class="no">Public</span> <span class="n">initializes</span> <span class="n">a</span> <span class="n">canvas</span> <span class="n">element</span> <span class="n">so</span> <span class="n">that</span> <span class="n">it</span> <span class="n">can</span> <span class="n">be</span> <span class="n">used</span> <span class="n">as</span> <span class="n">canvas</span>
+     <span class="o">*</span> <span class="n">element</span> <span class="n">from</span> <span class="n">now</span> <span class="n">on</span><span class="o">.</span> <span class="no">This</span> <span class="n">is</span> <span class="n">called</span> <span class="n">automatically</span> <span class="n">before</span> <span class="n">the</span> <span class="n">page</span> <span class="n">is</span>
+     <span class="o">*</span> <span class="n">loaded</span> <span class="n">but</span> <span class="k">if</span> <span class="n">you</span> <span class="n">are</span> <span class="n">creating</span> <span class="n">elements</span> <span class="n">using</span> <span class="n">createElement</span> <span class="n">you</span> <span class="n">need</span> <span class="n">to</span>
+     <span class="o">*</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">this</span> <span class="n">is</span> <span class="n">called</span> <span class="n">on</span> <span class="n">the</span> <span class="n">element</span><span class="o">.</span>
+     <span class="o">*</span> <span class="vi">@param</span> <span class="p">{</span><span class="no">HTMLElement</span><span class="p">}</span> <span class="n">el</span> <span class="no">The</span> <span class="n">canvas</span> <span class="n">element</span> <span class="n">to</span> <span class="kp">initialize</span><span class="o">.</span>
+     <span class="o">*</span> <span class="vi">@return</span> <span class="p">{</span><span class="no">HTMLElement</span><span class="p">}</span> <span class="n">the</span> <span class="n">element</span> <span class="n">that</span> <span class="n">was</span> <span class="n">created</span><span class="o">.</span>
+     <span class="o">*/</span>
+    <span class="n">initElement</span><span class="p">:</span> <span class="n">function</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">el</span><span class="o">.</span><span class="n">getContext</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="n">el</span><span class="o">.</span><span class="n">getContext</span> <span class="o">=</span> <span class="n">getContext</span><span class="p">;</span><span class="sr"></span>
+
+<span class="sr">        // Remove fallback content. There is no way to hide text nodes so we</span>
+<span class="sr">        /</span><span class="o">/</span> <span class="n">just</span> <span class="n">remove</span> <span class="n">all</span> <span class="n">childNodes</span><span class="o">.</span> <span class="no">We</span> <span class="n">could</span> <span class="n">hide</span> <span class="n">all</span> <span class="n">elements</span> <span class="ow">and</span> <span class="n">remove</span><span class="sr"></span>
+<span class="sr">        // text nodes but who really cares about the fallback content.</span>
+<span class="sr">        el.innerHTML = &#39;&#39;;</span>
+
+<span class="sr">        /</span><span class="o">/</span> <span class="k">do</span> <span class="ow">not</span> <span class="n">use</span> <span class="n">inline</span> <span class="n">function</span> <span class="n">because</span> <span class="n">that</span> <span class="n">will</span> <span class="n">leak</span> <span class="n">memory</span>
+        <span class="n">el</span><span class="o">.</span><span class="n">attachEvent</span><span class="p">(</span><span class="s1">&#39;onpropertychange&#39;</span><span class="p">,</span> <span class="n">onPropertyChange</span><span class="p">);</span>
+        <span class="n">el</span><span class="o">.</span><span class="n">attachEvent</span><span class="p">(</span><span class="s1">&#39;onresize&#39;</span><span class="p">,</span> <span class="n">onResize</span><span class="p">);</span>
+
+        <span class="n">var</span> <span class="n">attrs</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">attributes</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">width</span> <span class="o">&amp;&amp;</span> <span class="n">attrs</span><span class="o">.</span><span class="n">width</span><span class="o">.</span><span class="n">specified</span><span class="p">)</span> <span class="p">{</span><span class="sr"></span>
+<span class="sr">          // TODO: use runtimeStyle and coordsize</span>
+<span class="sr">          /</span><span class="o">/</span> <span class="n">el</span><span class="o">.</span><span class="n">getContext</span><span class="p">()</span><span class="o">.</span><span class="n">setWidth_</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">width</span><span class="o">.</span><span class="n">nodeValue</span><span class="p">);</span>
+          <span class="n">el</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">width</span><span class="o">.</span><span class="n">nodeValue</span> <span class="o">+</span> <span class="s1">&#39;px&#39;</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="n">el</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">clientWidth</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">height</span> <span class="o">&amp;&amp;</span> <span class="n">attrs</span><span class="o">.</span><span class="n">height</span><span class="o">.</span><span class="n">specified</span><span class="p">)</span> <span class="p">{</span><span class="sr"></span>
+<span class="sr">          // TODO: use runtimeStyle and coordsize</span>
+<span class="sr">          /</span><span class="o">/</span> <span class="n">el</span><span class="o">.</span><span class="n">getContext</span><span class="p">()</span><span class="o">.</span><span class="n">setHeight_</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">height</span><span class="o">.</span><span class="n">nodeValue</span><span class="p">);</span>
+          <span class="n">el</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">height</span><span class="o">.</span><span class="n">nodeValue</span> <span class="o">+</span> <span class="s1">&#39;px&#39;</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="n">el</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">clientHeight</span><span class="p">;</span>
+        <span class="p">}</span><span class="sr"></span>
+<span class="sr">        //el.getContext().setCoordsize_()</span>
+<span class="sr">      }</span>
+<span class="sr">      return el;</span>
+<span class="sr">    }</span>
+<span class="sr">  };</span>
+
+<span class="sr">  function onPropertyChange(e) {</span>
+<span class="sr">    var el = e.srcElement;</span>
+
+<span class="sr">    switch (e.propertyName) {</span>
+<span class="sr">      case &#39;width&#39;:</span>
+<span class="sr">        el.style.width = el.attributes.width.nodeValue + &#39;px&#39;;</span>
+<span class="sr">        el.getContext().clearRect();</span>
+<span class="sr">        break;</span>
+<span class="sr">      case &#39;height&#39;:</span>
+<span class="sr">        el.style.height = el.attributes.height.nodeValue + &#39;px&#39;;</span>
+<span class="sr">        el.getContext().clearRect();</span>
+<span class="sr">        break;</span>
+<span class="sr">    }</span>
+<span class="sr">  }</span>
+
+<span class="sr">  function onResize(e) {</span>
+<span class="sr">    var el = e.srcElement;</span>
+<span class="sr">    if (el.firstChild) {</span>
+<span class="sr">      el.firstChild.style.width =  el.clientWidth + &#39;px&#39;;</span>
+<span class="sr">      el.firstChild.style.height = el.clientHeight + &#39;px&#39;;</span>
+<span class="sr">    }</span>
+<span class="sr">  }</span>
+
+<span class="sr">  G_vmlCanvasManager_.init();</span>
+
+<span class="sr">  /</span><span class="o">/</span> <span class="n">precompute</span> <span class="s2">&quot;00&quot;</span> <span class="n">to</span> <span class="s2">&quot;FF&quot;</span>
+  <span class="n">var</span> <span class="n">dec2hex</span> <span class="o">=</span> <span class="o">[]</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">dec2hex</span><span class="o">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">16</span> <span class="o">+</span> <span class="n">j</span><span class="o">]</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span> <span class="o">+</span> <span class="n">j</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">function</span> <span class="n">createMatrixIdentity</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">[</span>
+      <span class="o">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">]</span>
+    <span class="o">]</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">function</span> <span class="n">matrixMultiply</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">result</span> <span class="o">=</span> <span class="n">createMatrixIdentity</span><span class="p">();</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">var</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">z</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">z</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">z</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">sum</span> <span class="o">+=</span> <span class="n">m1</span><span class="o">[</span><span class="n">x</span><span class="o">][</span><span class="n">z</span><span class="o">]</span> <span class="o">*</span> <span class="n">m2</span><span class="o">[</span><span class="n">z</span><span class="o">][</span><span class="n">y</span><span class="o">]</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">result</span><span class="o">[</span><span class="n">x</span><span class="o">][</span><span class="n">y</span><span class="o">]</span> <span class="o">=</span> <span class="n">sum</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">function</span> <span class="n">copyState</span><span class="p">(</span><span class="n">o1</span><span class="p">,</span> <span class="n">o2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">fillStyle</span>     <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">fillStyle</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">lineCap</span>       <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">lineCap</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">lineJoin</span>      <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">lineJoin</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">lineWidth</span>     <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">lineWidth</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">miterLimit</span>    <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">miterLimit</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">shadowBlur</span>    <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">shadowBlur</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">shadowColor</span>   <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">shadowColor</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">shadowOffsetX</span> <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">shadowOffsetX</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">shadowOffsetY</span> <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">shadowOffsetY</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">strokeStyle</span>   <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">strokeStyle</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">globalAlpha</span>   <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">globalAlpha</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">arcScaleX_</span>    <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">arcScaleX_</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">arcScaleY_</span>    <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">arcScaleY_</span><span class="p">;</span>
+    <span class="n">o2</span><span class="o">.</span><span class="n">lineScale_</span>    <span class="o">=</span> <span class="n">o1</span><span class="o">.</span><span class="n">lineScale_</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">function</span> <span class="n">processStyle</span><span class="p">(</span><span class="n">styleString</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">str</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="n">styleString</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="n">styleString</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">styleString</span><span class="o">.</span><span class="n">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;rgb&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">var</span> <span class="n">start</span> <span class="o">=</span> <span class="n">styleString</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+      <span class="n">var</span> <span class="k">end</span> <span class="o">=</span> <span class="n">styleString</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="n">var</span> <span class="n">guts</span> <span class="o">=</span> <span class="n">styleString</span><span class="o">.</span><span class="n">substring</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">end</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">);</span>
+
+      <span class="n">str</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span><span class="p">;</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">str</span> <span class="o">+=</span> <span class="n">dec2hex</span><span class="o">[</span><span class="no">Number</span><span class="p">(</span><span class="n">guts</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="n">guts</span><span class="o">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">4</span> <span class="o">&amp;&amp;</span> <span class="n">styleString</span><span class="o">.</span><span class="n">substr</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">guts</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">str</span> <span class="o">=</span> <span class="n">styleString</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">color</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">alpha</span><span class="p">};</span>
+  <span class="p">}</span>
+
+  <span class="n">function</span> <span class="n">processLineCap</span><span class="p">(</span><span class="n">lineCap</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">switch</span> <span class="p">(</span><span class="n">lineCap</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="s1">&#39;butt&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;flat&#39;</span><span class="p">;</span>
+      <span class="k">case</span> <span class="s1">&#39;round&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;round&#39;</span><span class="p">;</span>
+      <span class="k">case</span> <span class="s1">&#39;square&#39;</span><span class="p">:</span>
+      <span class="n">default</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;square&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span><span class="sr"></span>
+
+<span class="sr">  /**</span>
+<span class="sr">   * This class implements CanvasRenderingContext2D interface as described by</span>
+<span class="sr">   * the WHATWG.</span>
+<span class="sr">   * @param {HTMLElement} surfaceElement The element that the 2D context should</span>
+<span class="sr">   * be associated with</span>
+<span class="sr">   */</span>
+  <span class="n">function</span> <span class="no">CanvasRenderingContext2D_</span><span class="p">(</span><span class="n">surfaceElement</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">m_</span> <span class="o">=</span> <span class="n">createMatrixIdentity</span><span class="p">();</span>
+
+    <span class="n">this</span><span class="o">.</span><span class="n">mStack_</span> <span class="o">=</span> <span class="o">[]</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">aStack_</span> <span class="o">=</span> <span class="o">[]</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">currentPath_</span> <span class="o">=</span> <span class="o">[]</span><span class="p">;</span><span class="sr"></span>
+
+<span class="sr">    // Canvas context properties</span>
+<span class="sr">    this.strokeStyle = &#39;#000&#39;;</span>
+<span class="sr">    this.fillStyle = &#39;#000&#39;;</span>
+
+<span class="sr">    this.lineWidth = 1;</span>
+<span class="sr">    this.lineJoin = &#39;miter&#39;;</span>
+<span class="sr">    this.lineCap = &#39;butt&#39;;</span>
+<span class="sr">    this.miterLimit = Z * 1;</span>
+<span class="sr">    this.globalAlpha = 1;</span>
+<span class="sr">    this.canvas = surfaceElement;</span>
+
+<span class="sr">    var el = surfaceElement.ownerDocument.createElement(&#39;div&#39;);</span>
+<span class="sr">    el.style.width =  surfaceElement.clientWidth + &#39;px&#39;;</span>
+<span class="sr">    el.style.height = surfaceElement.clientHeight + &#39;px&#39;;</span>
+<span class="sr">    el.style.overflow = &#39;hidden&#39;;</span>
+<span class="sr">    el.style.position = &#39;absolute&#39;;</span>
+<span class="sr">    surfaceElement.appendChild(el);</span>
+
+<span class="sr">    this.element_ = el;</span>
+<span class="sr">    this.arcScaleX_ = 1;</span>
+<span class="sr">    this.arcScaleY_ = 1;</span>
+<span class="sr">    this.lineScale_ = 1;</span>
+<span class="sr">  }</span>
+
+<span class="sr">  var contextPrototype = CanvasRenderingContext2D_.prototype;</span>
+<span class="sr">  contextPrototype.clearRect = function() {</span>
+<span class="sr">    this.element_.innerHTML = &#39;&#39;;</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.beginPath = function() {</span>
+<span class="sr">    /</span><span class="o">/</span> <span class="no">TODO</span><span class="p">:</span> <span class="no">Branch</span> <span class="n">current</span> <span class="n">matrix</span> <span class="n">so</span> <span class="n">that</span> <span class="n">save</span><span class="o">/</span><span class="n">restore</span> <span class="n">has</span> <span class="n">no</span> <span class="n">effect</span><span class="sr"></span>
+<span class="sr">    //       as per safari docs.</span>
+<span class="sr">    this.currentPath_ = [];</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.moveTo = function(aX, aY) {</span>
+<span class="sr">    var p = this.getCoords_(aX, aY);</span>
+<span class="sr">    this.currentPath_.push({type: &#39;moveTo&#39;, x: p.x, y: p.y});</span>
+<span class="sr">    this.currentX_ = p.x;</span>
+<span class="sr">    this.currentY_ = p.y;</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.lineTo = function(aX, aY) {</span>
+<span class="sr">    var p = this.getCoords_(aX, aY);</span>
+<span class="sr">    this.currentPath_.push({type: &#39;lineTo&#39;, x: p.x, y: p.y});</span>
+
+<span class="sr">    this.currentX_ = p.x;</span>
+<span class="sr">    this.currentY_ = p.y;</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.bezierCurveTo = function(aCP1x, aCP1y,</span>
+<span class="sr">                                            aCP2x, aCP2y,</span>
+<span class="sr">                                            aX, aY) {</span>
+<span class="sr">    var p = this.getCoords_(aX, aY);</span>
+<span class="sr">    var cp1 = this.getCoords_(aCP1x, aCP1y);</span>
+<span class="sr">    var cp2 = this.getCoords_(aCP2x, aCP2y);</span>
+<span class="sr">    bezierCurveTo(this, cp1, cp2, p);</span>
+<span class="sr">  };</span>
+
+<span class="sr">  /</span><span class="o">/</span> <span class="no">Helper</span> <span class="n">function</span> <span class="n">that</span> <span class="n">takes</span> <span class="n">the</span> <span class="n">already</span> <span class="n">fixed</span> <span class="n">cordinates</span><span class="o">.</span>
+  <span class="n">function</span> <span class="n">bezierCurveTo</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">cp1</span><span class="p">,</span> <span class="n">cp2</span><span class="p">,</span> <span class="nb">p</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">currentPath_</span><span class="o">.</span><span class="n">push</span><span class="p">({</span>
+      <span class="nb">type</span><span class="p">:</span> <span class="s1">&#39;bezierCurveTo&#39;</span><span class="p">,</span>
+      <span class="n">cp1x</span><span class="p">:</span> <span class="n">cp1</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+      <span class="n">cp1y</span><span class="p">:</span> <span class="n">cp1</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+      <span class="n">cp2x</span><span class="p">:</span> <span class="n">cp2</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+      <span class="n">cp2y</span><span class="p">:</span> <span class="n">cp2</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+      <span class="n">x</span><span class="p">:</span> <span class="nb">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+      <span class="n">y</span><span class="p">:</span> <span class="nb">p</span><span class="o">.</span><span class="n">y</span>
+    <span class="p">});</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">currentX_</span> <span class="o">=</span> <span class="nb">p</span><span class="o">.</span><span class="n">x</span><span class="p">;</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">currentY_</span> <span class="o">=</span> <span class="nb">p</span><span class="o">.</span><span class="n">y</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">quadraticCurveTo</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">aCPx</span><span class="p">,</span> <span class="n">aCPy</span><span class="p">,</span> <span class="n">aX</span><span class="p">,</span> <span class="n">aY</span><span class="p">)</span> <span class="p">{</span><span class="sr"></span>
+<span class="sr">    // the following is lifted almost directly from</span>
+<span class="sr">    /</span><span class="o">/</span> <span class="n">http</span><span class="ss">:/</span><span class="o">/</span><span class="n">developer</span><span class="o">.</span><span class="n">mozilla</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">en</span><span class="o">/</span><span class="n">docs</span><span class="o">/</span><span class="no">Canvas_tutorial</span><span class="ss">:Drawing_shapes</span>
+
+    <span class="n">var</span> <span class="n">cp</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">getCoords_</span><span class="p">(</span><span class="n">aCPx</span><span class="p">,</span> <span class="n">aCPy</span><span class="p">);</span>
+    <span class="n">var</span> <span class="nb">p</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">getCoords_</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span> <span class="n">aY</span><span class="p">);</span>
+
+    <span class="n">var</span> <span class="n">cp1</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="n">x</span><span class="p">:</span> <span class="n">this</span><span class="o">.</span><span class="n">currentX_</span> <span class="o">+</span> <span class="mi">2</span><span class="o">.</span><span class="mi">0</span> <span class="o">/</span> <span class="mi">3</span><span class="o">.</span><span class="mi">0</span> <span class="o">*</span> <span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">currentX_</span><span class="p">),</span>
+      <span class="n">y</span><span class="p">:</span> <span class="n">this</span><span class="o">.</span><span class="n">currentY_</span> <span class="o">+</span> <span class="mi">2</span><span class="o">.</span><span class="mi">0</span> <span class="o">/</span> <span class="mi">3</span><span class="o">.</span><span class="mi">0</span> <span class="o">*</span> <span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">currentY_</span><span class="p">)</span>
+    <span class="p">};</span>
+    <span class="n">var</span> <span class="n">cp2</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="n">x</span><span class="p">:</span> <span class="n">cp1</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="nb">p</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">currentX_</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">y</span><span class="p">:</span> <span class="n">cp1</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="nb">p</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">currentY_</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="o">.</span><span class="mi">0</span>
+    <span class="p">};</span>
+
+    <span class="n">bezierCurveTo</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">cp1</span><span class="p">,</span> <span class="n">cp2</span><span class="p">,</span> <span class="nb">p</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">arc</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span> <span class="n">aY</span><span class="p">,</span> <span class="n">aRadius</span><span class="p">,</span>
+                                  <span class="n">aStartAngle</span><span class="p">,</span> <span class="n">aEndAngle</span><span class="p">,</span> <span class="n">aClockwise</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">aRadius</span> <span class="o">*=</span> <span class="n">Z</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">arcType</span> <span class="o">=</span> <span class="n">aClockwise</span> <span class="p">?</span> <span class="s1">&#39;at&#39;</span> <span class="p">:</span> <span class="s1">&#39;wa&#39;</span><span class="p">;</span>
+
+    <span class="n">var</span> <span class="n">xStart</span> <span class="o">=</span> <span class="n">aX</span> <span class="o">+</span> <span class="n">mc</span><span class="p">(</span><span class="n">aStartAngle</span><span class="p">)</span> <span class="o">*</span> <span class="n">aRadius</span> <span class="o">-</span> <span class="no">Z2</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">yStart</span> <span class="o">=</span> <span class="n">aY</span> <span class="o">+</span> <span class="n">ms</span><span class="p">(</span><span class="n">aStartAngle</span><span class="p">)</span> <span class="o">*</span> <span class="n">aRadius</span> <span class="o">-</span> <span class="no">Z2</span><span class="p">;</span>
+
+    <span class="n">var</span> <span class="n">xEnd</span> <span class="o">=</span> <span class="n">aX</span> <span class="o">+</span> <span class="n">mc</span><span class="p">(</span><span class="n">aEndAngle</span><span class="p">)</span> <span class="o">*</span> <span class="n">aRadius</span> <span class="o">-</span> <span class="no">Z2</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">yEnd</span> <span class="o">=</span> <span class="n">aY</span> <span class="o">+</span> <span class="n">ms</span><span class="p">(</span><span class="n">aEndAngle</span><span class="p">)</span> <span class="o">*</span> <span class="n">aRadius</span> <span class="o">-</span> <span class="no">Z2</span><span class="p">;</span><span class="sr"></span>
+
+<span class="sr">    // IE won&#39;t render arches drawn counter clockwise if xStart == xEnd.</span>
+<span class="sr">    if (xStart == xEnd &amp;&amp; !aClockwise) {</span>
+<span class="sr">      xStart += 0.125; /</span><span class="o">/</span> <span class="no">Offset</span> <span class="n">xStart</span> <span class="n">by</span> <span class="mi">1</span><span class="o">/</span><span class="mi">80</span> <span class="n">of</span> <span class="n">a</span> <span class="n">pixel</span><span class="o">.</span> <span class="no">Use</span> <span class="n">something</span><span class="sr"></span>
+<span class="sr">                       // that can be represented in binary</span>
+<span class="sr">    }</span>
+
+<span class="sr">    var p = this.getCoords_(aX, aY);</span>
+<span class="sr">    var pStart = this.getCoords_(xStart, yStart);</span>
+<span class="sr">    var pEnd = this.getCoords_(xEnd, yEnd);</span>
+
+<span class="sr">    this.currentPath_.push({type: arcType,</span>
+<span class="sr">                           x: p.x,</span>
+<span class="sr">                           y: p.y,</span>
+<span class="sr">                           radius: aRadius,</span>
+<span class="sr">                           xStart: pStart.x,</span>
+<span class="sr">                           yStart: pStart.y,</span>
+<span class="sr">                           xEnd: pEnd.x,</span>
+<span class="sr">                           yEnd: pEnd.y});</span>
+
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.rect = function(aX, aY, aWidth, aHeight) {</span>
+<span class="sr">    this.moveTo(aX, aY);</span>
+<span class="sr">    this.lineTo(aX + aWidth, aY);</span>
+<span class="sr">    this.lineTo(aX + aWidth, aY + aHeight);</span>
+<span class="sr">    this.lineTo(aX, aY + aHeight);</span>
+<span class="sr">    this.closePath();</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.strokeRect = function(aX, aY, aWidth, aHeight) {</span>
+<span class="sr">    var oldPath = this.currentPath_;</span>
+<span class="sr">    this.beginPath();</span>
+
+<span class="sr">    this.moveTo(aX, aY);</span>
+<span class="sr">    this.lineTo(aX + aWidth, aY);</span>
+<span class="sr">    this.lineTo(aX + aWidth, aY + aHeight);</span>
+<span class="sr">    this.lineTo(aX, aY + aHeight);</span>
+<span class="sr">    this.closePath();</span>
+<span class="sr">    this.stroke();</span>
+
+<span class="sr">    this.currentPath_ = oldPath;</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.fillRect = function(aX, aY, aWidth, aHeight) {</span>
+<span class="sr">    var oldPath = this.currentPath_;</span>
+<span class="sr">    this.beginPath();</span>
+
+<span class="sr">    this.moveTo(aX, aY);</span>
+<span class="sr">    this.lineTo(aX + aWidth, aY);</span>
+<span class="sr">    this.lineTo(aX + aWidth, aY + aHeight);</span>
+<span class="sr">    this.lineTo(aX, aY + aHeight);</span>
+<span class="sr">    this.closePath();</span>
+<span class="sr">    this.fill();</span>
+
+<span class="sr">    this.currentPath_ = oldPath;</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.createLinearGradient = function(aX0, aY0, aX1, aY1) {</span>
+<span class="sr">    var gradient = new CanvasGradient_(&#39;gradient&#39;);</span>
+<span class="sr">    gradient.x0_ = aX0;</span>
+<span class="sr">    gradient.y0_ = aY0;</span>
+<span class="sr">    gradient.x1_ = aX1;</span>
+<span class="sr">    gradient.y1_ = aY1;</span>
+<span class="sr">    return gradient;</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.createRadialGradient = function(aX0, aY0, aR0,</span>
+<span class="sr">                                                   aX1, aY1, aR1) {</span>
+<span class="sr">    var gradient = new CanvasGradient_(&#39;gradientradial&#39;);</span>
+<span class="sr">    gradient.x0_ = aX0;</span>
+<span class="sr">    gradient.y0_ = aY0;</span>
+<span class="sr">    gradient.r0_ = aR0;</span>
+<span class="sr">    gradient.x1_ = aX1;</span>
+<span class="sr">    gradient.y1_ = aY1;</span>
+<span class="sr">    gradient.r1_ = aR1;</span>
+<span class="sr">    return gradient;</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.drawImage = function(image, var_args) {</span>
+<span class="sr">    var dx, dy, dw, dh, sx, sy, sw, sh;</span>
+
+<span class="sr">    /</span><span class="o">/</span> <span class="n">to</span> <span class="n">find</span> <span class="n">the</span> <span class="n">original</span> <span class="n">width</span> <span class="n">we</span> <span class="n">overide</span> <span class="n">the</span> <span class="n">width</span> <span class="ow">and</span> <span class="n">height</span>
+    <span class="n">var</span> <span class="n">oldRuntimeWidth</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">runtimeStyle</span><span class="o">.</span><span class="n">width</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">oldRuntimeHeight</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">runtimeStyle</span><span class="o">.</span><span class="n">height</span><span class="p">;</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">runtimeStyle</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span><span class="p">;</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">runtimeStyle</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span><span class="p">;</span><span class="sr"></span>
+
+<span class="sr">    // get the original size</span>
+<span class="sr">    var w = image.width;</span>
+<span class="sr">    var h = image.height;</span>
+
+<span class="sr">    /</span><span class="o">/</span> <span class="ow">and</span> <span class="n">remove</span> <span class="n">overides</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">runtimeStyle</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">oldRuntimeWidth</span><span class="p">;</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">runtimeStyle</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">oldRuntimeHeight</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">dx</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">dy</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">sx</span> <span class="o">=</span> <span class="n">sy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="n">sw</span> <span class="o">=</span> <span class="n">dw</span> <span class="o">=</span> <span class="n">w</span><span class="p">;</span>
+      <span class="n">sh</span> <span class="o">=</span> <span class="n">dh</span> <span class="o">=</span> <span class="n">h</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">dx</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">dy</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">dw</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">dh</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">4</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">sx</span> <span class="o">=</span> <span class="n">sy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="n">sw</span> <span class="o">=</span> <span class="n">w</span><span class="p">;</span>
+      <span class="n">sh</span> <span class="o">=</span> <span class="n">h</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">9</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">sx</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">sy</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">sw</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">sh</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">4</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">dx</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">5</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">dy</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">dw</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">7</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">dh</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="kp">throw</span> <span class="no">Error</span><span class="p">(</span><span class="s1">&#39;Invalid number of arguments&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">var</span> <span class="n">d</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">getCoords_</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">);</span>
+
+    <span class="n">var</span> <span class="n">w2</span> <span class="o">=</span> <span class="n">sw</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">sh</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+
+    <span class="n">var</span> <span class="n">vmlStr</span> <span class="o">=</span> <span class="o">[]</span><span class="p">;</span>
+
+    <span class="n">var</span> <span class="n">W</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">H</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span><span class="sr"></span>
+
+<span class="sr">    // For some reason that I&#39;ve now forgotten, using divs didn&#39;t work</span>
+<span class="sr">    vmlStr.push(&#39; &lt;g_vml_:group&#39;,</span>
+<span class="sr">                &#39; coordsize=&quot;&#39;, Z * W, &#39;,&#39;, Z * H, &#39;&quot;&#39;,</span>
+<span class="sr">                &#39; coordorigin=&quot;0,0&quot;&#39; ,</span>
+<span class="sr">                &#39; style=&quot;width:&#39;, W, &#39;px;height:&#39;, H, &#39;px;position:absolute;&#39;);</span>
+
+<span class="sr">    /</span><span class="o">/</span> <span class="no">If</span> <span class="n">filters</span> <span class="n">are</span> <span class="n">necessary</span> <span class="p">(</span><span class="n">rotation</span> <span class="n">exists</span><span class="p">),</span> <span class="n">create</span> <span class="n">them</span><span class="sr"></span>
+<span class="sr">    // filters are bog-slow, so only create them if abbsolutely necessary</span>
+<span class="sr">    /</span><span class="o">/</span> <span class="no">The</span> <span class="n">following</span> <span class="n">check</span> <span class="n">doesn</span><span class="s1">&#39;t account for skews (which don&#39;</span><span class="n">t</span> <span class="n">exist</span><span class="sr"></span>
+<span class="sr">    // in the canvas spec (yet) anyway.</span>
+
+<span class="sr">    if (this.m_[0][0] != 1 || this.m_[0][1]) {</span>
+<span class="sr">      var filter = [];</span>
+
+<span class="sr">      /</span><span class="o">/</span> <span class="no">Note</span> <span class="n">the</span> <span class="mi">12</span><span class="o">/</span><span class="mi">21</span> <span class="n">reversal</span>
+      <span class="n">filter</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s1">&#39;M11=&#39;</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="o">[</span><span class="mi">0</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;M12=&#39;</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;M21=&#39;</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="o">[</span><span class="mi">0</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;M22=&#39;</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;Dx=&#39;</span><span class="p">,</span> <span class="n">mr</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">x</span> <span class="o">/</span> <span class="n">Z</span><span class="p">),</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;Dy=&#39;</span><span class="p">,</span> <span class="n">mr</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">y</span> <span class="o">/</span> <span class="n">Z</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">);</span><span class="sr"></span>
+
+<span class="sr">      // Bounding box calculation (need to minimize displayed area so that</span>
+<span class="sr">      /</span><span class="o">/</span> <span class="n">filters</span> <span class="n">don</span><span class="s1">&#39;t waste time on unused pixels.</span>
+<span class="s1">      var max = d;</span>
+<span class="s1">      var c2 = this.getCoords_(dx + dw, dy);</span>
+<span class="s1">      var c3 = this.getCoords_(dx, dy + dh);</span>
+<span class="s1">      var c4 = this.getCoords_(dx + dw, dy + dh);</span>
+
+<span class="s1">      max.x = m.max(max.x, c2.x, c3.x, c4.x);</span>
+<span class="s1">      max.y = m.max(max.y, c2.y, c3.y, c4.y);</span>
+
+<span class="s1">      vmlStr.push(&#39;</span><span class="n">padding</span><span class="p">:</span><span class="mi">0</span> <span class="s1">&#39;, mr(max.x / Z), &#39;</span><span class="n">px</span> <span class="s1">&#39;, mr(max.y / Z),</span>
+<span class="s1">                  &#39;</span><span class="n">px</span> <span class="mi">0</span><span class="p">;</span><span class="n">filter</span><span class="ss">:progid:DXImageTransform</span><span class="o">.</span><span class="n">Microsoft</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="s1">&#39;,</span>
+<span class="s1">                  filter.join(&#39;&#39;), &quot;, sizingmethod=&#39;</span><span class="n">clip</span><span class="s1">&#39;);&quot;)</span>
+<span class="s1">    } else {</span>
+<span class="s1">      vmlStr.push(&#39;</span><span class="n">top</span><span class="ss">:&#39;, mr(d.y / Z), &#39;</span><span class="n">px</span><span class="p">;</span><span class="n">left</span><span class="ss">:&#39;, mr(d.x / Z), &#39;</span><span class="n">px</span><span class="p">;</span><span class="s1">&#39;);</span>
+<span class="s1">    }</span>
+
+<span class="s1">    vmlStr.push(&#39;</span> <span class="s2">&quot;&gt;&#39; ,</span>
+<span class="s2">                &#39;&lt;g_vml_:image src=&quot;</span><span class="s1">&#39;, image.src, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                &#39; style=&quot;</span><span class="n">width</span><span class="ss">:&#39;, Z * dw, &#39;</span><span class="n">px</span><span class="p">;</span><span class="s1">&#39;,</span>
+<span class="s1">                &#39;</span> <span class="n">height</span><span class="ss">:&#39;, Z * dh, &#39;</span><span class="n">px</span><span class="p">;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                &#39; cropleft=&quot;</span><span class="s1">&#39;, sx / w, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                &#39; croptop=&quot;</span><span class="s1">&#39;, sy / h, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                &#39; cropright=&quot;</span><span class="s1">&#39;, (w - sx - sw) / w, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                &#39; cropbottom=&quot;</span><span class="s1">&#39;, (h - sy - sh) / h, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                &#39; /&gt;&#39;,</span>
+<span class="s2">                &#39;&lt;/g_vml_:group&gt;&#39;);</span>
+
+<span class="s2">    this.element_.insertAdjacentHTML(&#39;BeforeEnd&#39;,</span>
+<span class="s2">                                    vmlStr.join(&#39;&#39;));</span>
+<span class="s2">  };</span>
+
+<span class="s2">  contextPrototype.stroke = function(aFill) {</span>
+<span class="s2">    var lineStr = [];</span>
+<span class="s2">    var lineOpen = false;</span>
+<span class="s2">    var a = processStyle(aFill ? this.fillStyle : this.strokeStyle);</span>
+<span class="s2">    var color = a.color;</span>
+<span class="s2">    var opacity = a.alpha * this.globalAlpha;</span>
+
+<span class="s2">    var W = 10;</span>
+<span class="s2">    var H = 10;</span>
+
+<span class="s2">    lineStr.push(&#39;&lt;g_vml_:shape&#39;,</span>
+<span class="s2">                 &#39; filled=&quot;</span><span class="s1">&#39;, !!aFill, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                 &#39; style=&quot;</span><span class="n">position</span><span class="ss">:absolute</span><span class="p">;</span><span class="n">width</span><span class="ss">:&#39;, W, &#39;</span><span class="n">px</span><span class="p">;</span><span class="n">height</span><span class="ss">:&#39;, H, &#39;</span><span class="n">px</span><span class="p">;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                 &#39; coordorigin=&quot;</span><span class="mi">0</span> <span class="mi">0</span><span class="s2">&quot; coordsize=&quot;</span><span class="s1">&#39;, Z * W, &#39;</span> <span class="s1">&#39;, Z * H, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                 &#39; stroked=&quot;</span><span class="s1">&#39;, !aFill, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                 &#39; path=&quot;</span><span class="s1">&#39;);</span>
+
+<span class="s1">    var newSeq = false;</span>
+<span class="s1">    var min = {x: null, y: null};</span>
+<span class="s1">    var max = {x: null, y: null};</span>
+
+<span class="s1">    for (var i = 0; i &lt; this.currentPath_.length; i++) {</span>
+<span class="s1">      var p = this.currentPath_[i];</span>
+<span class="s1">      var c;</span>
+
+<span class="s1">      switch (p.type) {</span>
+<span class="s1">        case &#39;</span><span class="n">moveTo</span><span class="s1">&#39;:</span>
+<span class="s1">          c = p;</span>
+<span class="s1">          lineStr.push(&#39;</span> <span class="n">m</span> <span class="s1">&#39;, mr(p.x), &#39;</span><span class="p">,</span><span class="s1">&#39;, mr(p.y));</span>
+<span class="s1">          break;</span>
+<span class="s1">        case &#39;</span><span class="n">lineTo</span><span class="s1">&#39;:</span>
+<span class="s1">          lineStr.push(&#39;</span> <span class="n">l</span> <span class="s1">&#39;, mr(p.x), &#39;</span><span class="p">,</span><span class="s1">&#39;, mr(p.y));</span>
+<span class="s1">          break;</span>
+<span class="s1">        case &#39;</span><span class="n">close</span><span class="s1">&#39;:</span>
+<span class="s1">          lineStr.push(&#39;</span> <span class="n">x</span> <span class="s1">&#39;);</span>
+<span class="s1">          p = null;</span>
+<span class="s1">          break;</span>
+<span class="s1">        case &#39;</span><span class="n">bezierCurveTo</span><span class="s1">&#39;:</span>
+<span class="s1">          lineStr.push(&#39;</span> <span class="n">c</span> <span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.cp1x), &#39;</span><span class="p">,</span><span class="s1">&#39;, mr(p.cp1y), &#39;</span><span class="p">,</span><span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.cp2x), &#39;</span><span class="p">,</span><span class="s1">&#39;, mr(p.cp2y), &#39;</span><span class="p">,</span><span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.x), &#39;</span><span class="p">,</span><span class="s1">&#39;, mr(p.y));</span>
+<span class="s1">          break;</span>
+<span class="s1">        case &#39;</span><span class="n">at</span><span class="s1">&#39;:</span>
+<span class="s1">        case &#39;</span><span class="n">wa</span><span class="s1">&#39;:</span>
+<span class="s1">          lineStr.push(&#39;</span> <span class="s1">&#39;, p.type, &#39;</span> <span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.x - this.arcScaleX_ * p.radius), &#39;</span><span class="p">,</span><span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.y - this.arcScaleY_ * p.radius), &#39;</span> <span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.x + this.arcScaleX_ * p.radius), &#39;</span><span class="p">,</span><span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.y + this.arcScaleY_ * p.radius), &#39;</span> <span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.xStart), &#39;</span><span class="p">,</span><span class="s1">&#39;, mr(p.yStart), &#39;</span> <span class="s1">&#39;,</span>
+<span class="s1">                       mr(p.xEnd), &#39;</span><span class="p">,</span><span class="s1">&#39;, mr(p.yEnd));</span>
+<span class="s1">          break;</span>
+<span class="s1">      }</span>
+
+
+<span class="s1">      // TODO: Following is broken for curves due to</span>
+<span class="s1">      //       move to proper paths.</span>
+
+<span class="s1">      // Figure out dimensions so we can do gradient fills</span>
+<span class="s1">      // properly</span>
+<span class="s1">      if (p) {</span>
+<span class="s1">        if (min.x == null || p.x &lt; min.x) {</span>
+<span class="s1">          min.x = p.x;</span>
+<span class="s1">        }</span>
+<span class="s1">        if (max.x == null || p.x &gt; max.x) {</span>
+<span class="s1">          max.x = p.x;</span>
+<span class="s1">        }</span>
+<span class="s1">        if (min.y == null || p.y &lt; min.y) {</span>
+<span class="s1">          min.y = p.y;</span>
+<span class="s1">        }</span>
+<span class="s1">        if (max.y == null || p.y &gt; max.y) {</span>
+<span class="s1">          max.y = p.y;</span>
+<span class="s1">        }</span>
+<span class="s1">      }</span>
+<span class="s1">    }</span>
+<span class="s1">    lineStr.push(&#39;</span> <span class="s2">&quot;&gt;&#39;);</span>
+
+<span class="s2">    if (!aFill) {</span>
+<span class="s2">      var lineWidth = this.lineScale_ * this.lineWidth;</span>
+
+<span class="s2">      // VML cannot correctly render a line if the width is less than 1px.</span>
+<span class="s2">      // In that case, we dilute the color to make the line look thinner.</span>
+<span class="s2">      if (lineWidth &lt; 1) {</span>
+<span class="s2">        opacity *= lineWidth;</span>
+<span class="s2">      }</span>
+
+<span class="s2">      lineStr.push(</span>
+<span class="s2">        &#39;&lt;g_vml_:stroke&#39;,</span>
+<span class="s2">        &#39; opacity=&quot;</span><span class="s1">&#39;, opacity, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">        &#39; joinstyle=&quot;</span><span class="s1">&#39;, this.lineJoin, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">        &#39; miterlimit=&quot;</span><span class="s1">&#39;, this.miterLimit, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">        &#39; endcap=&quot;</span><span class="s1">&#39;, processLineCap(this.lineCap), &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">        &#39; weight=&quot;</span><span class="s1">&#39;, lineWidth, &#39;</span><span class="n">px</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">        &#39; color=&quot;</span><span class="s1">&#39;, color, &#39;</span><span class="s2">&quot; /&gt;&#39;</span>
+<span class="s2">      );</span>
+<span class="s2">    } else if (typeof this.fillStyle == &#39;object&#39;) {</span>
+<span class="s2">      var fillStyle = this.fillStyle;</span>
+<span class="s2">      var angle = 0;</span>
+<span class="s2">      var focus = {x: 0, y: 0};</span>
+
+<span class="s2">      // additional offset</span>
+<span class="s2">      var shift = 0;</span>
+<span class="s2">      // scale factor for offset</span>
+<span class="s2">      var expansion = 1;</span>
+
+<span class="s2">      if (fillStyle.type_ == &#39;gradient&#39;) {</span>
+<span class="s2">        var x0 = fillStyle.x0_ / this.arcScaleX_;</span>
+<span class="s2">        var y0 = fillStyle.y0_ / this.arcScaleY_;</span>
+<span class="s2">        var x1 = fillStyle.x1_ / this.arcScaleX_;</span>
+<span class="s2">        var y1 = fillStyle.y1_ / this.arcScaleY_;</span>
+<span class="s2">        var p0 = this.getCoords_(x0, y0);</span>
+<span class="s2">        var p1 = this.getCoords_(x1, y1);</span>
+<span class="s2">        var dx = p1.x - p0.x;</span>
+<span class="s2">        var dy = p1.y - p0.y;</span>
+<span class="s2">        angle = Math.atan2(dx, dy) * 180 / Math.PI;</span>
+
+<span class="s2">        // The angle should be a non-negative number.</span>
+<span class="s2">        if (angle &lt; 0) {</span>
+<span class="s2">          angle += 360;</span>
+<span class="s2">        }</span>
+
+<span class="s2">        // Very small angles produce an unexpected result because they are</span>
+<span class="s2">        // converted to a scientific notation string.</span>
+<span class="s2">        if (angle &lt; 1e-6) {</span>
+<span class="s2">          angle = 0;</span>
+<span class="s2">        }</span>
+<span class="s2">      } else {</span>
+<span class="s2">        var p0 = this.getCoords_(fillStyle.x0_, fillStyle.y0_);</span>
+<span class="s2">        var width  = max.x - min.x;</span>
+<span class="s2">        var height = max.y - min.y;</span>
+<span class="s2">        focus = {</span>
+<span class="s2">          x: (p0.x - min.x) / width,</span>
+<span class="s2">          y: (p0.y - min.y) / height</span>
+<span class="s2">        };</span>
+
+<span class="s2">        width  /= this.arcScaleX_ * Z;</span>
+<span class="s2">        height /= this.arcScaleY_ * Z;</span>
+<span class="s2">        var dimension = m.max(width, height);</span>
+<span class="s2">        shift = 2 * fillStyle.r0_ / dimension;</span>
+<span class="s2">        expansion = 2 * fillStyle.r1_ / dimension - shift;</span>
+<span class="s2">      }</span>
+
+<span class="s2">      // We need to sort the color stops in ascending order by offset,</span>
+<span class="s2">      // otherwise IE won&#39;t interpret it correctly.</span>
+<span class="s2">      var stops = fillStyle.colors_;</span>
+<span class="s2">      stops.sort(function(cs1, cs2) {</span>
+<span class="s2">        return cs1.offset - cs2.offset;</span>
+<span class="s2">      });</span>
+
+<span class="s2">      var length = stops.length;</span>
+<span class="s2">      var color1 = stops[0].color;</span>
+<span class="s2">      var color2 = stops[length - 1].color;</span>
+<span class="s2">      var opacity1 = stops[0].alpha * this.globalAlpha;</span>
+<span class="s2">      var opacity2 = stops[length - 1].alpha * this.globalAlpha;</span>
+
+<span class="s2">      var colors = [];</span>
+<span class="s2">      for (var i = 0; i &lt; length; i++) {</span>
+<span class="s2">        var stop = stops[i];</span>
+<span class="s2">        colors.push(stop.offset * expansion + shift + &#39; &#39; + stop.color);</span>
+<span class="s2">      }</span>
+
+<span class="s2">      // When colors attribute is used, the meanings of opacity and o:opacity2</span>
+<span class="s2">      // are reversed.</span>
+<span class="s2">      lineStr.push(&#39;&lt;g_vml_:fill type=&quot;</span><span class="s1">&#39;, fillStyle.type_, &#39;</span><span class="s2">&quot;&#39;,</span>
+<span class="s2">                   &#39; method=&quot;</span><span class="n">none</span><span class="s2">&quot; focus=&quot;</span><span class="mi">100</span><span class="sx">%&quot;&#39;,</span>
+<span class="sx">                   &#39; color=&quot;&#39;, color1, &#39;&quot;&#39;,</span>
+<span class="sx">                   &#39; color2=&quot;&#39;, color2, &#39;&quot;&#39;,</span>
+<span class="sx">                   &#39; colors=&quot;&#39;, colors.join(&#39;,&#39;), &#39;&quot;&#39;,</span>
+<span class="sx">                   &#39; opacity=&quot;&#39;, opacity2, &#39;&quot;&#39;,</span>
+<span class="sx">                   &#39; g_o_:opacity2=&quot;&#39;, opacity1, &#39;&quot;&#39;,</span>
+<span class="sx">                   &#39; angle=&quot;&#39;, angle, &#39;&quot;&#39;,</span>
+<span class="sx">                   &#39; focusposition=&quot;&#39;, focus.x, &#39;,&#39;, focus.y, &#39;&quot; /&gt;&#39;);</span>
+<span class="sx">    } else {</span>
+<span class="sx">      lineStr.push(&#39;&lt;g_vml_:fill color=&quot;&#39;, color, &#39;&quot; opacity=&quot;&#39;, opacity,</span>
+<span class="sx">                   &#39;&quot;</span><span class="sr"> /&gt;&#39;);</span>
+<span class="sr">    }</span>
+
+<span class="sr">    lineStr.push(&#39;&lt;/</span><span class="n">g_vml_</span><span class="ss">:shape</span><span class="o">&gt;</span><span class="s1">&#39;);</span>
+
+<span class="s1">    this.element_.insertAdjacentHTML(&#39;</span><span class="n">beforeEnd</span><span class="s1">&#39;, lineStr.join(&#39;&#39;));</span>
+<span class="s1">  };</span>
+
+<span class="s1">  contextPrototype.fill = function() {</span>
+<span class="s1">    this.stroke(true);</span>
+<span class="s1">  }</span>
+
+<span class="s1">  contextPrototype.closePath = function() {</span>
+<span class="s1">    this.currentPath_.push({type: &#39;</span><span class="n">close</span><span class="err">&#39;</span><span class="p">});</span>
+  <span class="p">};</span><span class="sr"></span>
+
+<span class="sr">  /**</span>
+<span class="sr">   * @private</span>
+<span class="sr">   */</span>
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">getCoords_</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span> <span class="n">aY</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">m</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="n">x</span><span class="p">:</span> <span class="n">Z</span> <span class="o">*</span> <span class="p">(</span><span class="n">aX</span> <span class="o">*</span> <span class="n">m</span><span class="o">[</span><span class="mi">0</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span> <span class="o">+</span> <span class="n">aY</span> <span class="o">*</span> <span class="n">m</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span> <span class="o">+</span> <span class="n">m</span><span class="o">[</span><span class="mi">2</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span> <span class="o">-</span> <span class="no">Z2</span><span class="p">,</span>
+      <span class="n">y</span><span class="p">:</span> <span class="n">Z</span> <span class="o">*</span> <span class="p">(</span><span class="n">aX</span> <span class="o">*</span> <span class="n">m</span><span class="o">[</span><span class="mi">0</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span> <span class="o">+</span> <span class="n">aY</span> <span class="o">*</span> <span class="n">m</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span> <span class="o">+</span> <span class="n">m</span><span class="o">[</span><span class="mi">2</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span> <span class="o">-</span> <span class="no">Z2</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">o</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="n">copyState</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">o</span><span class="p">);</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">aStack_</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">o</span><span class="p">);</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">mStack_</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="p">);</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">m_</span> <span class="o">=</span> <span class="n">matrixMultiply</span><span class="p">(</span><span class="n">createMatrixIdentity</span><span class="p">(),</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">restore</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">copyState</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">aStack_</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span> <span class="n">this</span><span class="p">);</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">m_</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">mStack_</span><span class="o">.</span><span class="n">pop</span><span class="p">();</span>
+  <span class="p">};</span>
+
+  <span class="n">function</span> <span class="n">matrixIsFinite</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">isFinite</span><span class="p">(</span><span class="n">m</span><span class="o">[</span><span class="n">j</span><span class="o">][</span><span class="n">k</span><span class="o">]</span><span class="p">)</span> <span class="o">||</span> <span class="n">isNaN</span><span class="p">(</span><span class="n">m</span><span class="o">[</span><span class="n">j</span><span class="o">][</span><span class="n">k</span><span class="o">]</span><span class="p">))</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="kp">false</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kp">true</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">function</span> <span class="n">setM</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">updateLineScale</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">matrixIsFinite</span><span class="p">(</span><span class="n">m</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">m_</span> <span class="o">=</span> <span class="n">m</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">updateLineScale</span><span class="p">)</span> <span class="p">{</span><span class="sr"></span>
+<span class="sr">      // Get the line scale.</span>
+<span class="sr">      /</span><span class="o">/</span> <span class="no">Determinant</span> <span class="n">of</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span> <span class="n">means</span> <span class="n">how</span> <span class="n">much</span> <span class="n">the</span> <span class="n">area</span> <span class="n">is</span> <span class="n">enlarged</span> <span class="n">by</span> <span class="n">the</span><span class="sr"></span>
+<span class="sr">      // transformation. So its square root can be used as a scale factor</span>
+<span class="sr">      /</span><span class="o">/</span> <span class="k">for</span> <span class="n">width</span><span class="o">.</span>
+      <span class="n">var</span> <span class="n">det</span> <span class="o">=</span> <span class="n">m</span><span class="o">[</span><span class="mi">0</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span> <span class="o">*</span> <span class="n">m</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span> <span class="o">-</span> <span class="n">m</span><span class="o">[</span><span class="mi">0</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span> <span class="o">*</span> <span class="n">m</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span><span class="p">;</span>
+      <span class="n">ctx</span><span class="o">.</span><span class="n">lineScale_</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">abs</span><span class="p">(</span><span class="n">det</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">translate</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span> <span class="n">aY</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">m1</span> <span class="o">=</span> <span class="o">[</span>
+      <span class="o">[</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="n">aX</span><span class="p">,</span> <span class="n">aY</span><span class="p">,</span> <span class="mi">1</span><span class="o">]</span>
+    <span class="o">]</span><span class="p">;</span>
+
+    <span class="n">setM</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">matrixMultiply</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="p">),</span> <span class="kp">false</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">rotate</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">aRot</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">c</span> <span class="o">=</span> <span class="n">mc</span><span class="p">(</span><span class="n">aRot</span><span class="p">);</span>
+    <span class="n">var</span> <span class="n">s</span> <span class="o">=</span> <span class="n">ms</span><span class="p">(</span><span class="n">aRot</span><span class="p">);</span>
+
+    <span class="n">var</span> <span class="n">m1</span> <span class="o">=</span> <span class="o">[</span>
+      <span class="o">[</span><span class="n">c</span><span class="p">,</span>  <span class="n">s</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[-</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">]</span>
+    <span class="o">]</span><span class="p">;</span>
+
+    <span class="n">setM</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">matrixMultiply</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="p">),</span> <span class="kp">false</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span> <span class="n">aY</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">arcScaleX_</span> <span class="o">*=</span> <span class="n">aX</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">arcScaleY_</span> <span class="o">*=</span> <span class="n">aY</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">m1</span> <span class="o">=</span> <span class="o">[</span>
+      <span class="o">[</span><span class="n">aX</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="mi">0</span><span class="p">,</span>  <span class="n">aY</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="o">]</span>
+    <span class="o">]</span><span class="p">;</span>
+
+    <span class="n">setM</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">matrixMultiply</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="p">),</span> <span class="kp">true</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">m11</span><span class="p">,</span> <span class="n">m12</span><span class="p">,</span> <span class="n">m21</span><span class="p">,</span> <span class="n">m22</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">m1</span> <span class="o">=</span> <span class="o">[</span>
+      <span class="o">[</span><span class="n">m11</span><span class="p">,</span> <span class="n">m12</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="n">m21</span><span class="p">,</span> <span class="n">m22</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="n">dx</span><span class="p">,</span>  <span class="n">dy</span><span class="p">,</span>  <span class="mi">1</span><span class="o">]</span>
+    <span class="o">]</span><span class="p">;</span>
+
+    <span class="n">setM</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">matrixMultiply</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">m_</span><span class="p">),</span> <span class="kp">true</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">setTransform</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">m11</span><span class="p">,</span> <span class="n">m12</span><span class="p">,</span> <span class="n">m21</span><span class="p">,</span> <span class="n">m22</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">m</span> <span class="o">=</span> <span class="o">[</span>
+      <span class="o">[</span><span class="n">m11</span><span class="p">,</span> <span class="n">m12</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="n">m21</span><span class="p">,</span> <span class="n">m22</span><span class="p">,</span> <span class="mi">0</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">[</span><span class="n">dx</span><span class="p">,</span>  <span class="n">dy</span><span class="p">,</span>  <span class="mi">1</span><span class="o">]</span>
+    <span class="o">]</span><span class="p">;</span>
+
+    <span class="n">setM</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="kp">true</span><span class="p">);</span>
+  <span class="p">};</span><span class="sr"></span>
+
+<span class="sr">  /******** STUBS ********/</span>
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">clip</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="p">{</span><span class="sr"></span>
+<span class="sr">    // TODO: Implement</span>
+<span class="sr">  };</span>
+
+<span class="sr">  contextPrototype.arcTo = function() {</span>
+<span class="sr">    /</span><span class="o">/</span> <span class="no">TODO</span><span class="p">:</span> <span class="no">Implement</span>
+  <span class="p">};</span>
+
+  <span class="n">contextPrototype</span><span class="o">.</span><span class="n">createPattern</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kp">new</span> <span class="no">CanvasPattern_</span><span class="p">;</span>
+  <span class="p">};</span><span class="sr"></span>
+
+<span class="sr">  // Gradient /</span> <span class="no">Pattern</span> <span class="no">Stubs</span>
+  <span class="n">function</span> <span class="no">CanvasGradient_</span><span class="p">(</span><span class="n">aType</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">aType</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">x0_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">y0_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">r0_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">x1_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">y1_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">r1_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">colors_</span> <span class="o">=</span> <span class="o">[]</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="no">CanvasGradient_</span><span class="o">.</span><span class="n">prototype</span><span class="o">.</span><span class="n">addColorStop</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">aOffset</span><span class="p">,</span> <span class="n">aColor</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">aColor</span> <span class="o">=</span> <span class="n">processStyle</span><span class="p">(</span><span class="n">aColor</span><span class="p">);</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">colors_</span><span class="o">.</span><span class="n">push</span><span class="p">({</span><span class="n">offset</span><span class="p">:</span> <span class="n">aOffset</span><span class="p">,</span>
+                       <span class="n">color</span><span class="p">:</span> <span class="n">aColor</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+                       <span class="n">alpha</span><span class="p">:</span> <span class="n">aColor</span><span class="o">.</span><span class="n">alpha</span><span class="p">});</span>
+  <span class="p">};</span>
+
+  <span class="n">function</span> <span class="no">CanvasPattern_</span><span class="p">()</span> <span class="p">{}</span><span class="sr"></span>
+
+<span class="sr">  // set up externs</span>
+<span class="sr">  G_vmlCanvasManager = G_vmlCanvasManager_;</span>
+<span class="sr">  CanvasRenderingContext2D = CanvasRenderingContext2D_;</span>
+<span class="sr">  CanvasGradient = CanvasGradient_;</span>
+<span class="sr">  CanvasPattern = CanvasPattern_;</span>
+
+<span class="sr">})();</span>
+
+<span class="sr">} /</span><span class="o">/</span> <span class="k">if</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

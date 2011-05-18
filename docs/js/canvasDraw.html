@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>canvasDraw.coffee</title>
+  <link rel="stylesheet" href="http://github.com/jashkenas/docco/raw/0.3.0/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="addText.html">addText.coffee</a>
+          <a class="source" href="canvasDraw.html">canvasDraw.coffee</a>
+          <a class="source" href="saveImage.html">saveImage.coffee</a>
+          <a class="source" href="videoToCanvas.html">videoToCanvas.coffee</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>canvasDraw.coffee</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p>Draw in canvas script
+Declare four color variables: colorPurple, colorGreen, colorYellow, colorBrown with corresponding hex color values,
+a variable to store the current color: curColor, and an array to match the chosen color when the user clicked the canvas clickColor.
+Create a cursor size as well.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">colorPurple</span> <span class="o">=</span> <span class="s2">&quot;#cb3594&quot;</span>
+<span class="n">colorGreen</span> <span class="o">=</span> <span class="s2">&quot;#659b41&quot;</span>
+<span class="n">colorYellow</span> <span class="o">=</span> <span class="s2">&quot;#ffcf33&quot;</span>
+<span class="n">colorBrown</span> <span class="o">=</span> <span class="s2">&quot;#986928&quot;</span>
+<span class="n">colorWhite</span> <span class="o">=</span> <span class="s2">&quot;#ffffff&quot;</span>
+
+<span class="n">curColor</span> <span class="o">=</span> <span class="n">colorPurple</span>
+<span class="n">clickColor</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+
+<span class="n">clickSize</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+<span class="n">curSize</span> <span class="o">=</span> <span class="s2">&quot;normal&quot;</span>
+<span class="n">canvasWidth</span> <span class="o">=</span> <span class="mi">640</span>
+<span class="n">canvasHeight</span> <span class="o">=</span> <span class="mi">360</span>
+<span class="n">canvas</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s1">&#39;#c&#39;</span><span class="p">)</span>
+<span class="n">context</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s1">&#39;#c&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getContext</span> <span class="s2">&quot;2d&quot;</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>Mouse Down Event: When the user clicks on canvas we record the position in an array via the addClick function.
+We set the boolean paint to true. Finally we update the canvas with the function redraw.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="err">$</span><span class="p">(</span><span class="s1">&#39;#c&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">mouseX</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">pageX</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">offsetLeft</span>
+  <span class="n">mouseY</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">pageY</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">offsetTop</span>
+  <span class="n">paint</span> <span class="o">=</span> <span class="kp">true</span>
+  <span class="n">addClick</span> <span class="n">e</span><span class="o">.</span><span class="n">pageX</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">offsetLeft</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">pageY</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">offsetTop</span>
+  <span class="n">redraw</span><span class="p">()</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-3'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-3">&#182;</a>
+        </div>
+        <p>clear canvas on &ldquo;Clear&rdquo; button press</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="err">$</span><span class="p">(</span><span class="s1">&#39;#clearCanvas&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">clickX</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+  <span class="n">clickY</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+  <span class="n">clickDrag</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+  <span class="n">clickColor</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+  <span class="n">clearCanvas</span><span class="p">()</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-4'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-4">&#182;</a>
+        </div>
+        <p>button mousedown events to select color and cursor size</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="err">$</span><span class="p">(</span><span class="s1">&#39;#choosePurpleColors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curColor</span> <span class="o">=</span> <span class="n">colorPurple</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#chooseGreenColors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curColor</span> <span class="o">=</span> <span class="n">colorGreen</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#chooseYellowColors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curColor</span> <span class="o">=</span> <span class="n">colorYellow</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#chooseBrownColors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curColor</span> <span class="o">=</span> <span class="n">colorBrown</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#chooseWhiteColors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curColor</span> <span class="o">=</span> <span class="n">colorWhite</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#chooseSmallSizes&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curSize</span> <span class="o">=</span> <span class="s2">&quot;small&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#chooseNormalSizes&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curSize</span> <span class="o">=</span> <span class="s2">&quot;normal&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#chooseLargeSizes&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curSize</span> <span class="o">=</span> <span class="s2">&quot;large&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#chooseHugeSizes&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousedown</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">curSize</span> <span class="o">=</span> <span class="s2">&quot;huge&quot;</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-5'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-5">&#182;</a>
+        </div>
+        <p>Mouse Move Event: Just like moving the tip of a marker on a sheet of paper, we want to draw on the canvas when our user is pressing down.
+The boolean paint will let us know if the virtual marker is pressing down on the paper or not.
+If paint is true, then we record the value. Then redraw.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="err">$</span><span class="p">(</span><span class="s1">&#39;#c&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mousemove</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="k">if</span> <span class="n">paint</span>
+    <span class="n">addClick</span> <span class="n">e</span><span class="o">.</span><span class="n">pageX</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">offsetLeft</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">pageY</span> <span class="o">-</span> <span class="n">this</span><span class="o">.</span><span class="n">offsetTop</span><span class="p">,</span> <span class="kp">true</span>
+    <span class="n">redraw</span><span class="p">()</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-6'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-6">&#182;</a>
+        </div>
+        <p>Mouse Up Event: Marker is off the paper; paint boolean will remember!</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="err">$</span><span class="p">(</span><span class="s1">&#39;#c&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mouseup</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">paint</span> <span class="o">=</span> <span class="kp">false</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-7'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-7">&#182;</a>
+        </div>
+        <p>Mouse Leave Event: If the marker goes off the paper, then forget you!</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="err">$</span><span class="p">(</span><span class="s1">&#39;#c&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mouseleave</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">paint</span> <span class="o">=</span> <span class="kp">false</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-8'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-8">&#182;</a>
+        </div>
+        <p>Here is the addClick function that will save the click position:</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">clickX</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+<span class="n">clickY</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+<span class="n">clickDrag</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">()</span>
+<span class="n">paint</span>
+
+<span class="n">addClick</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dragging</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">clickX</span><span class="o">.</span><span class="n">push</span> <span class="n">x</span>
+  <span class="n">clickY</span><span class="o">.</span><span class="n">push</span> <span class="n">y</span>
+  <span class="n">clickDrag</span><span class="o">.</span><span class="n">push</span> <span class="n">dragging</span>
+  <span class="n">clickColor</span><span class="o">.</span><span class="n">push</span> <span class="n">curColor</span>
+  <span class="n">clickSize</span><span class="o">.</span><span class="n">push</span> <span class="n">curSize</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-9'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-9">&#182;</a>
+        </div>
+        <p>The redraw function is where the magic happens. Each time the function is called the canvas is cleared and everything is redrawn.
+We could be more efficient and redraw only certain aspects that have been changed, but let&rsquo;s keep it simple.
+We set a few stroke properties for the color, shape, and width. Then for every time we recorded as a marker on paper we are going to draw a line.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">redraw</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-10'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-10">&#182;</a>
+        </div>
+        <p>canvas.width = canvas.width; // Clears the canvas</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">context</span><span class="o">.</span><span class="n">lineJoin</span> <span class="o">=</span> <span class="s2">&quot;round&quot;</span>
+  <span class="n">radius</span> <span class="o">=</span> <span class="mi">5</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="n">clickX</span><span class="o">.</span><span class="n">length</span>
+    <span class="k">if</span> <span class="n">clickSize</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="n">is</span> <span class="s2">&quot;small&quot;</span>
+      <span class="n">radius</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">clickSize</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="n">is</span> <span class="s2">&quot;normal&quot;</span>
+      <span class="n">radius</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">clickSize</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="n">is</span> <span class="s2">&quot;large&quot;</span>
+      <span class="n">radius</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">clickSize</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="n">is</span> <span class="s2">&quot;huge&quot;</span>
+      <span class="n">radius</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">beginPath</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">clickDrag</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="ow">and</span> <span class="n">i</span>
+      <span class="n">context</span><span class="o">.</span><span class="n">moveTo</span> <span class="n">clickX</span><span class="o">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span> <span class="n">clickY</span><span class="o">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span>
+    <span class="k">else</span>
+      <span class="n">context</span><span class="o">.</span><span class="n">moveTo</span> <span class="n">clickX</span><span class="o">[</span><span class="n">i</span><span class="o">]-</span><span class="mi">1</span><span class="p">,</span> <span class="n">clickY</span><span class="o">[</span><span class="n">i</span><span class="o">]</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">lineTo</span> <span class="n">clickX</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">,</span> <span class="n">clickY</span><span class="o">[</span><span class="n">i</span><span class="o">]</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">closePath</span><span class="p">()</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">strokeStyle</span> <span class="o">=</span> <span class="n">clickColor</span><span class="o">[</span><span class="n">i</span><span class="o">]</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">lineWidth</span> <span class="o">=</span> <span class="n">radius</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">stroke</span><span class="p">()</span>
+    </pre></div>
+      </td>
+    </tr>
+    <tr id='section-11'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-11">&#182;</a>
+        </div>
+        <p>clear canvas</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">clearCanvas</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span>
+  <span class="n">context</span><span class="o">.</span><span class="n">fillStyle</span> <span class="o">=</span> <span class="s1">&#39;#ffffff&#39;</span> <span class="c1"># Work around for Chrome</span>
+  <span class="n">context</span><span class="o">.</span><span class="n">fillRect</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">canvasWidth</span><span class="p">,</span> <span class="n">canvasHeight</span> <span class="c1"># Fill in the canvas with white</span>
+  <span class="n">canvas</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">width</span> <span class="c1"># clears the canvas</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>jquery.ghindaVideoPlayer.js</title>
+  <link rel="stylesheet" href="http://github.com/jashkenas/docco/raw/0.3.0/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="base64.html">base64.js</a>
+          <a class="source" href="canvas2image.html">canvas2image.js</a>
+          <a class="source" href="excanvas.html">excanvas.js</a>
+          <a class="source" href="jquery.ghindaVideoPlayer.html">jquery.ghindaVideoPlayer.js</a>
+          <a class="source" href="text.html">text.js</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>jquery.ghindaVideoPlayer.js</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="sr">/*</span>
+<span class="sr"> * ghindaVideoPlayer - jQuery plugin 1.0.0</span>
+<span class="sr"> *</span>
+<span class="sr"> * Copyright (c) 2010 Cristian-Ionut Colceriu</span>
+<span class="sr"> *</span>
+<span class="sr"> * www.ghinda.net</span>
+<span class="sr"> * contact@ghinda.net</span>
+<span class="sr"> *</span>
+<span class="sr"> */</span>
+
+<span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="err">$</span><span class="p">)</span> <span class="p">{</span><span class="sr"></span>
+<span class="sr">  // plugin definition</span>
+<span class="sr">  $.fn.gVideo = function(options) {		</span>
+<span class="sr">    /</span><span class="o">/</span> <span class="n">build</span> <span class="n">main</span> <span class="n">options</span> <span class="n">before</span> <span class="n">element</span> <span class="n">iteration</span>		
+    <span class="n">var</span> <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="n">theme</span><span class="p">:</span> <span class="s1">&#39;simpledark&#39;</span><span class="p">,</span>
+      <span class="n">childtheme</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">};</span>
+    <span class="n">var</span> <span class="n">options</span> <span class="o">=</span> <span class="vg">$.</span><span class="kp">extend</span><span class="p">(</span><span class="n">defaults</span><span class="p">,</span> <span class="n">options</span><span class="p">);</span><span class="sr"></span>
+<span class="sr">    // iterate and reformat each matched element</span>
+<span class="sr">    return this.each(function() {</span>
+<span class="sr">      var $gVideo = $(this);</span>
+<span class="sr">      </span>
+<span class="sr">      /</span><span class="o">/</span><span class="n">create</span> <span class="n">html</span> <span class="n">structure</span><span class="sr"></span>
+<span class="sr">      //main wrapper</span>
+<span class="sr">      var $video_wrap = $(&#39;&lt;div&gt;&lt;/</span><span class="n">div</span><span class="o">&gt;</span><span class="s1">&#39;).addClass(&#39;</span><span class="n">ghinda</span><span class="o">-</span><span class="n">video</span><span class="o">-</span><span class="n">player</span><span class="s1">&#39;).addClass(options.theme).addClass(options.childtheme);</span>
+<span class="s1">      //controls wraper</span>
+<span class="s1">      var $video_controls = $(&#39;</span><span class="o">&lt;</span><span class="n">div</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;ghinda-video-controls&quot;</span><span class="o">&gt;&lt;</span><span class="n">a</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;ghinda-video-play&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Play/Pause&quot;</span><span class="o">&gt;&lt;</span><span class="sr">/a&gt;&lt;div class=&quot;ghinda-video-seek&quot;&gt;&lt;/</span><span class="n">div</span><span class="o">&gt;&lt;</span><span class="n">div</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;ghinda-video-timer&quot;</span><span class="o">&gt;</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="o">&lt;</span><span class="sr">/div&gt;&lt;div class=&quot;ghinda-volume-box&quot;&gt;&lt;div class=&quot;ghinda-volume-slider&quot;&gt;&lt;/</span><span class="n">div</span><span class="o">&gt;&lt;</span><span class="n">a</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;ghinda-volume-button&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Mute/Unmute&quot;</span><span class="o">&gt;&lt;</span><span class="sr">/a&gt;&lt;/</span><span class="n">div</span><span class="o">&gt;&lt;</span><span class="sr">/div&gt;&#39;);						</span>
+<span class="sr">      $gVideo.wrap($video_wrap);</span>
+<span class="sr">      $gVideo.after($video_controls);</span>
+<span class="sr">      </span>
+<span class="sr">      /</span><span class="o">/</span><span class="n">get</span> <span class="kp">new</span> <span class="n">elements</span>
+      <span class="n">var</span> <span class="vg">$video_container</span> <span class="o">=</span> <span class="vg">$gVideo</span><span class="o">.</span><span class="n">parent</span><span class="p">(</span><span class="s1">&#39;.ghinda-video-player&#39;</span><span class="p">);</span>
+      <span class="n">var</span> <span class="vg">$video_controls</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s1">&#39;.ghinda-video-controls&#39;</span><span class="p">,</span> <span class="vg">$video_container</span><span class="p">);</span>
+      <span class="n">var</span> <span class="vg">$ghinda_play_btn</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s1">&#39;.ghinda-video-play&#39;</span><span class="p">,</span> <span class="vg">$video_container</span><span class="p">);</span>
+      <span class="n">var</span> <span class="vg">$ghinda_video_seek</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s1">&#39;.ghinda-video-seek&#39;</span><span class="p">,</span> <span class="vg">$video_container</span><span class="p">);</span>
+      <span class="n">var</span> <span class="vg">$ghinda_video_timer</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s1">&#39;.ghinda-video-timer&#39;</span><span class="p">,</span> <span class="vg">$video_container</span><span class="p">);</span>
+      <span class="n">var</span> <span class="vg">$ghinda_volume</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s1">&#39;.ghinda-volume-slider&#39;</span><span class="p">,</span> <span class="vg">$video_container</span><span class="p">);</span>
+      <span class="n">var</span> <span class="vg">$ghinda_volume_btn</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s1">&#39;.ghinda-volume-button&#39;</span><span class="p">,</span> <span class="vg">$video_container</span><span class="p">);</span>
+      
+      <span class="vg">$video_controls</span><span class="o">.</span><span class="n">hide</span><span class="p">();</span><span class="sr"> // keep the controls hidden</span>
+<span class="sr">            </span>
+<span class="sr">      var gPlay = function() {</span>
+<span class="sr">        if($gVideo.attr(&#39;paused&#39;) == false) {</span>
+<span class="sr">          $gVideo[0].pause();					</span>
+<span class="sr">        } else {</span>
+<span class="sr">          /</span><span class="o">/</span><span class="n">clear</span> <span class="n">the</span> <span class="n">canvas</span> <span class="n">so</span> <span class="n">annotations</span> <span class="n">dont</span> <span class="n">reappear</span> <span class="n">on</span> <span class="n">pause</span> <span class="ow">and</span> <span class="n">subsequent</span> <span class="kp">new</span> <span class="n">draw</span>
+          <span class="n">clickX</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">();</span>
+          <span class="n">clickY</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">();</span>
+          <span class="n">clickDrag</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">();</span>
+          <span class="n">clickColor</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">();</span>
+          <span class="n">clearCanvas</span><span class="p">();</span><span class="sr"></span>
+<span class="sr">          //here will be some code to save the image to server</span>
+<span class="sr">          /</span><span class="o">/</span><span class="n">start</span> <span class="n">playing</span> <span class="n">again</span>					
+          <span class="vg">$gVideo</span><span class="o">[</span><span class="mi">0</span><span class="o">].</span><span class="n">play</span><span class="p">();</span>				
+        <span class="p">}</span>
+      <span class="p">};</span><span class="sr"></span>
+<span class="sr">      //pause the video is it is playing and someone starts to draw anyway</span>
+<span class="sr">      var canvasPause = function() {</span>
+<span class="sr">        if($gVideo.attr(&#39;paused&#39;) == false) {</span>
+<span class="sr">          $gVideo[0].pause();					</span>
+<span class="sr">        } else {</span>
+<span class="sr">          /</span><span class="o">/</span><span class="k">do</span> <span class="n">nothing</span>		
+        <span class="p">}</span>
+      <span class="p">};</span>
+      
+      <span class="vg">$ghinda_play_btn</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">gPlay</span><span class="p">);</span><span class="sr"></span>
+<span class="sr">      //quickly play and pause the video is the clear button is pressed. prevents black screen</span>
+<span class="sr">      $(&#39;#clearCanvas&#39;).click(function() {</span>
+<span class="sr">        $gVideo[0].play();</span>
+<span class="sr">        setTimeout ( function() { </span>
+<span class="sr">          $gVideo[0].pause();</span>
+<span class="sr">        }, 10 );</span>
+<span class="sr">        /</span><span class="o">/</span><span class="vg">$gVideo</span><span class="o">[</span><span class="mi">0</span><span class="o">].</span><span class="n">pause</span><span class="p">();</span>
+      <span class="p">});</span><span class="sr"></span>
+<span class="sr">      //when canvas is clicked pause video</span>
+<span class="sr">      $(&#39;#c&#39;).mousedown(canvasPause);</span>
+<span class="sr">      $gVideo.click(gPlay);</span>
+<span class="sr">      </span>
+<span class="sr">      $gVideo.bind(&#39;play&#39;, function() {</span>
+<span class="sr">        $ghinda_play_btn.addClass(&#39;ghinda-paused-button&#39;);</span>
+<span class="sr">      });</span>
+<span class="sr">      </span>
+<span class="sr">      $gVideo.bind(&#39;pause&#39;, function() {</span>
+<span class="sr">        $ghinda_play_btn.removeClass(&#39;ghinda-paused-button&#39;);</span>
+<span class="sr">      });</span>
+<span class="sr">      </span>
+<span class="sr">      $gVideo.bind(&#39;ended&#39;, function() {</span>
+<span class="sr">        $ghinda_play_btn.removeClass(&#39;ghinda-paused-button&#39;);</span>
+<span class="sr">      });</span>
+<span class="sr">      </span>
+<span class="sr">      var seeksliding;			</span>
+<span class="sr">      var createSeek = function() {</span>
+<span class="sr">        if($gVideo.attr(&#39;readyState&#39;)) {</span>
+<span class="sr">          var video_duration = $gVideo.attr(&#39;duration&#39;);</span>
+<span class="sr">          $ghinda_video_seek.slider({</span>
+<span class="sr">            value: 0,</span>
+<span class="sr">            step: 0.01,</span>
+<span class="sr">            orientation: &quot;horizontal&quot;,</span>
+<span class="sr">            range: &quot;min&quot;,</span>
+<span class="sr">            max: video_duration,</span>
+<span class="sr">            animate: true,					</span>
+<span class="sr">            slide: function(){							</span>
+<span class="sr">              seeksliding = true;</span>
+<span class="sr">            },</span>
+<span class="sr">            stop:function(e,ui){</span>
+<span class="sr">              seeksliding = false;						</span>
+<span class="sr">              $gVideo.attr(&quot;currentTime&quot;,ui.value);</span>
+<span class="sr">            }</span>
+<span class="sr">          });</span>
+<span class="sr">          $video_controls.show();					</span>
+<span class="sr">        } else {</span>
+<span class="sr">          setTimeout(createSeek, 150);</span>
+<span class="sr">        }</span>
+<span class="sr">      };</span>
+
+<span class="sr">      createSeek();</span>
+<span class="sr">    </span>
+<span class="sr">      var gTimeFormat=function(seconds){</span>
+<span class="sr">        var m=Math.floor(seconds/</span><span class="mi">60</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">10</span><span class="o">?</span><span class="s2">&quot;0&quot;</span><span class="o">+</span><span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">seconds</span><span class="o">/</span><span class="mi">60</span><span class="p">)</span><span class="ss">:Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">seconds</span><span class="o">/</span><span class="mi">60</span><span class="p">);</span>
+        <span class="n">var</span> <span class="n">s</span><span class="o">=</span><span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">seconds</span><span class="o">-</span><span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="mi">60</span><span class="p">))</span><span class="o">&lt;</span><span class="mi">10</span><span class="o">?</span><span class="s2">&quot;0&quot;</span><span class="o">+</span><span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">seconds</span><span class="o">-</span><span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="mi">60</span><span class="p">))</span><span class="ss">:Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">seconds</span><span class="o">-</span><span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="mi">60</span><span class="p">));</span>
+        <span class="k">return</span> <span class="n">m</span><span class="o">+</span><span class="s2">&quot;:&quot;</span><span class="o">+</span><span class="n">s</span><span class="p">;</span>
+      <span class="p">};</span>
+      
+      <span class="n">var</span> <span class="n">seekUpdate</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">var</span> <span class="n">currenttime</span> <span class="o">=</span> <span class="vg">$gVideo</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;currentTime&#39;</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">seeksliding</span><span class="p">)</span> <span class="vg">$ghinda_video_seek</span><span class="o">.</span><span class="n">slider</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">currenttime</span><span class="p">);</span>
+        <span class="vg">$ghinda_video_timer</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">gTimeFormat</span><span class="p">(</span><span class="n">currenttime</span><span class="p">));</span>							
+      <span class="p">};</span>
+      
+      <span class="vg">$gVideo</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s1">&#39;timeupdate&#39;</span><span class="p">,</span> <span class="n">seekUpdate</span><span class="p">);</span>	
+      
+      <span class="n">var</span> <span class="n">video_volume</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+      <span class="vg">$ghinda_volume</span><span class="o">.</span><span class="n">slider</span><span class="p">({</span>
+        <span class="n">value</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">orientation</span><span class="p">:</span> <span class="s2">&quot;vertical&quot;</span><span class="p">,</span>
+        <span class="n">range</span><span class="p">:</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span>
+        <span class="n">max</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">step</span><span class="p">:</span> <span class="mi">0</span><span class="o">.</span><span class="mo">05</span><span class="p">,</span>
+        <span class="n">animate</span><span class="p">:</span> <span class="kp">true</span><span class="p">,</span>
+        <span class="n">slide</span><span class="ss">:function</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">ui</span><span class="p">){</span>
+            <span class="vg">$gVideo</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;muted&#39;</span><span class="p">,</span><span class="kp">false</span><span class="p">);</span>
+            <span class="n">video_volume</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">value</span><span class="p">;</span>
+            <span class="vg">$gVideo</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">,</span><span class="n">ui</span><span class="o">.</span><span class="n">value</span><span class="p">);</span>
+          <span class="p">}</span>
+      <span class="p">});</span>
+      
+      <span class="n">var</span> <span class="n">muteVolume</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span><span class="vg">$gVideo</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;muted&#39;</span><span class="p">)</span><span class="o">==</span><span class="kp">true</span><span class="p">)</span> <span class="p">{</span>
+          <span class="vg">$gVideo</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;muted&#39;</span><span class="p">,</span> <span class="kp">false</span><span class="p">);</span>
+          <span class="vg">$ghinda_volume</span><span class="o">.</span><span class="n">slider</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">video_volume</span><span class="p">);</span>
+          
+          <span class="vg">$ghinda_volume_btn</span><span class="o">.</span><span class="n">removeClass</span><span class="p">(</span><span class="s1">&#39;ghinda-volume-mute&#39;</span><span class="p">);</span>					
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="vg">$gVideo</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s1">&#39;muted&#39;</span><span class="p">,</span> <span class="kp">true</span><span class="p">);</span>
+          <span class="vg">$ghinda_volume</span><span class="o">.</span><span class="n">slider</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">);</span>
+          
+          <span class="vg">$ghinda_volume_btn</span><span class="o">.</span><span class="n">addClass</span><span class="p">(</span><span class="s1">&#39;ghinda-volume-mute&#39;</span><span class="p">);</span>
+        <span class="p">};</span>
+      <span class="p">};</span>
+      
+      <span class="vg">$ghinda_volume_btn</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">muteVolume</span><span class="p">);</span>
+      
+      <span class="vg">$gVideo</span><span class="o">.</span><span class="n">removeAttr</span><span class="p">(</span><span class="s1">&#39;controls&#39;</span><span class="p">);</span>
+      
+    <span class="p">});</span>
+  <span class="p">};</span><span class="sr"></span>
+
+<span class="sr">  //</span>
+<span class="sr">  /</span><span class="o">/</span> <span class="n">plugin</span> <span class="n">defaults</span><span class="sr"></span>
+<span class="sr">  //</span>
+<span class="sr">  $.fn.gVideo.defaults = {		</span>
+<span class="sr">  };</span>
+
+<span class="sr">})(jQuery);</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

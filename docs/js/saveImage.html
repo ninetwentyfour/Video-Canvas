@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>saveImage.coffee</title>
+  <link rel="stylesheet" href="http://github.com/jashkenas/docco/raw/0.3.0/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="addText.html">addText.coffee</a>
+          <a class="source" href="canvasDraw.html">canvasDraw.coffee</a>
+          <a class="source" href="saveImage.html">saveImage.coffee</a>
+          <a class="source" href="videoToCanvas.html">videoToCanvas.coffee</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>saveImage.coffee</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p>save image to desktop</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">oCanvas</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s2">&quot;#c&quot;</span><span class="p">)</span>
+
+<span class="n">showDownloadText</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span>
+  <span class="err">$</span><span class="p">(</span><span class="s2">&quot;#buttoncontainer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">css</span> <span class="s2">&quot;display&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span>
+  <span class="err">$</span><span class="p">(</span><span class="s2">&quot;#textdownload&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">css</span> <span class="s2">&quot;display&quot;</span><span class="p">,</span> <span class="s2">&quot;block&quot;</span>
+
+<span class="n">hideDownloadText</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span>
+  <span class="err">$</span><span class="p">(</span><span class="s2">&quot;#buttoncontainer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">css</span> <span class="s2">&quot;display&quot;</span><span class="p">,</span> <span class="s2">&quot;block&quot;</span>
+  <span class="err">$</span><span class="p">(</span><span class="s2">&quot;#textdownload&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">css</span> <span class="s2">&quot;display&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span>
+
+<span class="n">convertCanvas</span> <span class="o">=</span> <span class="p">(</span><span class="n">strType</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="k">if</span> <span class="n">strType</span> <span class="n">is</span> <span class="s2">&quot;PNG&quot;</span>
+    <span class="n">oImg</span> <span class="o">=</span> <span class="no">Canvas2Image</span><span class="o">.</span><span class="n">saveAsPNG</span> <span class="n">oCanvas</span><span class="p">,</span> <span class="kp">true</span>
+  <span class="k">if</span> <span class="n">strType</span> <span class="n">is</span> <span class="s2">&quot;BMP&quot;</span>
+    <span class="n">oImg</span> <span class="o">=</span> <span class="no">Canvas2Image</span><span class="o">.</span><span class="n">saveAsBMP</span> <span class="n">oCanvas</span><span class="p">,</span> <span class="kp">true</span>
+  <span class="k">if</span> <span class="n">strType</span> <span class="n">is</span> <span class="s2">&quot;JPEG&quot;</span>
+    <span class="n">oImg</span> <span class="o">=</span> <span class="no">Canvas2Image</span><span class="o">.</span><span class="n">saveAsJPEG</span> <span class="n">oCanvas</span><span class="p">,</span> <span class="kp">true</span>
+  <span class="k">if</span> <span class="o">!</span><span class="n">oImg</span>
+    <span class="n">alert</span> <span class="s2">&quot;Sorry, this browser is not capable of saving &quot;</span> <span class="o">+</span> <span class="n">strType</span> <span class="o">+</span> <span class="s2">&quot; files!&quot;</span>
+    <span class="k">return</span> <span class="kp">false</span>
+  <span class="n">oImg</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&quot;canvasimage&quot;</span>
+  <span class="n">oImg</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">border</span> <span class="o">=</span> <span class="n">oCanvas</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">border</span>
+  <span class="n">oCanvas</span><span class="o">.</span><span class="n">parentNode</span><span class="o">.</span><span class="n">replaceChild</span> <span class="n">oImg</span><span class="p">,</span> <span class="n">oCanvas</span>
+  <span class="n">showDownloadText</span><span class="p">()</span>
+
+<span class="n">saveCanvas</span> <span class="o">=</span> <span class="p">(</span><span class="n">pCanvas</span><span class="p">,</span> <span class="n">strType</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="n">bRes</span> <span class="o">=</span> <span class="kp">false</span>
+  <span class="k">if</span> <span class="n">strType</span> <span class="n">is</span> <span class="s2">&quot;PNG&quot;</span>
+    <span class="n">bRes</span> <span class="o">=</span> <span class="no">Canvas2Image</span><span class="o">.</span><span class="n">saveAsPNG</span> <span class="n">oCanvas</span>
+  <span class="k">if</span> <span class="n">strType</span> <span class="n">is</span> <span class="s2">&quot;BMP&quot;</span>
+    <span class="n">bRes</span> <span class="o">=</span> <span class="no">Canvas2Image</span><span class="o">.</span><span class="n">saveAsBMP</span> <span class="n">oCanvas</span>
+  <span class="k">if</span> <span class="n">strType</span> <span class="n">is</span> <span class="s2">&quot;JPEG&quot;</span>
+    <span class="n">bRes</span> <span class="o">=</span> <span class="no">Canvas2Image</span><span class="o">.</span><span class="n">saveAsJPEG</span> <span class="n">oCanvas</span>
+  <span class="k">if</span> <span class="o">!</span><span class="n">bRes</span>
+    <span class="n">alert</span> <span class="s2">&quot;Sorry, this browser is not capable of saving &quot;</span> <span class="o">+</span> <span class="n">strType</span> <span class="o">+</span> <span class="s2">&quot; files!&quot;</span>
+    <span class="k">return</span> <span class="kp">false</span>
+
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#savepngbtn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span> <span class="o">-&gt;</span>
+  <span class="n">saveCanvas</span> <span class="n">oCanvas</span><span class="p">,</span> <span class="s2">&quot;PNG&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#savebmpbtn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span> <span class="o">-&gt;</span>
+  <span class="n">saveCanvas</span> <span class="n">oCanvas</span><span class="p">,</span> <span class="s2">&quot;BMP&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#savejpegbtn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span> <span class="o">-&gt;</span>
+  <span class="n">saveCanvas</span> <span class="n">oCanvas</span><span class="p">,</span> <span class="s2">&quot;JPEG&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#convertpngbtn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span> <span class="o">-&gt;</span>
+  <span class="n">convertCanvas</span> <span class="s2">&quot;PNG&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#convertbmpbtn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span> <span class="o">-&gt;</span>
+  <span class="n">convertCanvas</span> <span class="s2">&quot;BMP&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#convertjpegbtn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span> <span class="o">-&gt;</span>
+  <span class="n">convertCanvas</span> <span class="s2">&quot;JPEG&quot;</span>
+<span class="err">$</span><span class="p">(</span><span class="s1">&#39;#resetbtn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span> <span class="o">-&gt;</span>
+  <span class="n">oImg</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="s2">&quot;#canvasimage&quot;</span><span class="p">);</span>
+  <span class="n">oImg</span><span class="o">.</span><span class="n">parentNode</span><span class="o">.</span><span class="n">replaceChild</span> <span class="n">oCanvas</span><span class="p">,</span> <span class="n">oImg</span>
+  <span class="n">hideDownloadText</span><span class="p">()</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

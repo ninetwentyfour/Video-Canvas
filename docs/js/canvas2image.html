@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>canvas2image.js</title>
+  <link rel="stylesheet" href="http://github.com/jashkenas/docco/raw/0.3.0/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="base64.html">base64.js</a>
+          <a class="source" href="canvas2image.html">canvas2image.js</a>
+          <a class="source" href="excanvas.html">excanvas.js</a>
+          <a class="source" href="jquery.ghindaVideoPlayer.html">jquery.ghindaVideoPlayer.js</a>
+          <a class="source" href="text.html">text.js</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>canvas2image.js</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="sr">/*</span>
+<span class="sr"> * Canvas2Image v0.1</span>
+<span class="sr"> * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk</span>
+<span class="sr"> * MIT License [http:/</span><span class="o">/</span><span class="n">www</span><span class="o">.</span><span class="n">opensource</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">licenses</span><span class="o">/</span><span class="n">mit</span><span class="o">-</span><span class="n">license</span><span class="o">.</span><span class="n">php</span><span class="o">]</span>
+ <span class="o">*/</span>
+
+<span class="n">var</span> <span class="no">Canvas2Image</span> <span class="o">=</span> <span class="p">(</span><span class="n">function</span><span class="p">()</span> <span class="p">{</span><span class="sr"></span>
+
+<span class="sr">  // check if we have canvas support</span>
+<span class="sr">  var bHasCanvas = false;</span>
+<span class="sr">  var oCanvas = document.createElement(&quot;canvas&quot;);</span>
+<span class="sr">  if (oCanvas.getContext(&quot;2d&quot;)) {</span>
+<span class="sr">    bHasCanvas = true;</span>
+<span class="sr">  }</span>
+
+<span class="sr">  /</span><span class="o">/</span> <span class="n">no</span> <span class="n">canvas</span><span class="p">,</span> <span class="n">bail</span> <span class="n">out</span><span class="o">.</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">bHasCanvas</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="n">saveAsBMP</span> <span class="p">:</span> <span class="n">function</span><span class="p">(){},</span>
+      <span class="n">saveAsPNG</span> <span class="p">:</span> <span class="n">function</span><span class="p">(){},</span>
+      <span class="n">saveAsJPEG</span> <span class="p">:</span> <span class="n">function</span><span class="p">(){}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">var</span> <span class="n">bHasImageData</span> <span class="o">=</span> <span class="o">!!</span><span class="p">(</span><span class="n">oCanvas</span><span class="o">.</span><span class="n">getContext</span><span class="p">(</span><span class="s2">&quot;2d&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getImageData</span><span class="p">);</span>
+  <span class="n">var</span> <span class="n">bHasDataURL</span> <span class="o">=</span> <span class="o">!!</span><span class="p">(</span><span class="n">oCanvas</span><span class="o">.</span><span class="n">toDataURL</span><span class="p">);</span>
+  <span class="n">var</span> <span class="n">bHasBase64</span> <span class="o">=</span> <span class="o">!!</span><span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">btoa</span><span class="p">);</span>
+
+  <span class="n">var</span> <span class="n">strDownloadMime</span> <span class="o">=</span> <span class="s2">&quot;image/octet-stream&quot;</span><span class="p">;</span><span class="sr"></span>
+
+<span class="sr">  // ok, we&#39;re good</span>
+<span class="sr">  var readCanvasData = function(oCanvas) {</span>
+<span class="sr">    var iWidth = parseInt(oCanvas.width);</span>
+<span class="sr">    var iHeight = parseInt(oCanvas.height);</span>
+<span class="sr">    return oCanvas.getContext(&quot;2d&quot;).getImageData(0,0,iWidth,iHeight);</span>
+<span class="sr">  }</span>
+
+<span class="sr">  /</span><span class="o">/</span> <span class="n">base64</span> <span class="n">encodes</span> <span class="n">either</span> <span class="n">a</span> <span class="n">string</span> <span class="ow">or</span> <span class="n">an</span> <span class="n">array</span> <span class="n">of</span> <span class="n">charcodes</span>
+  <span class="n">var</span> <span class="n">encodeData</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">strData</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">typeof</span> <span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">strData</span> <span class="o">=</span> <span class="n">data</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">var</span> <span class="n">aData</span> <span class="o">=</span> <span class="n">data</span><span class="p">;</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">aData</span><span class="o">.</span><span class="n">length</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">strData</span> <span class="o">+=</span> <span class="nb">String</span><span class="o">.</span><span class="n">fromCharCode</span><span class="p">(</span><span class="n">aData</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">btoa</span><span class="p">(</span><span class="n">strData</span><span class="p">);</span>
+  <span class="p">}</span><span class="sr"></span>
+
+<span class="sr">  // creates a base64 encoded string containing BMP data</span>
+<span class="sr">  /</span><span class="o">/</span> <span class="n">takes</span> <span class="n">an</span> <span class="n">imagedata</span> <span class="n">object</span> <span class="n">as</span> <span class="n">argument</span>
+  <span class="n">var</span> <span class="n">createBMP</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">oData</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">aHeader</span> <span class="o">=</span> <span class="o">[]</span><span class="p">;</span>
+  
+    <span class="n">var</span> <span class="n">iWidth</span> <span class="o">=</span> <span class="n">oData</span><span class="o">.</span><span class="n">width</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">iHeight</span> <span class="o">=</span> <span class="n">oData</span><span class="o">.</span><span class="n">height</span><span class="p">;</span>
+
+    <span class="n">aHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mh">0x42</span><span class="p">);</span><span class="sr"> // magic 1</span>
+<span class="sr">    aHeader.push(0x4D); </span>
+<span class="sr">  </span>
+<span class="sr">    var iFileSize = iWidth*iHeight*3 + 54; /</span><span class="o">/</span> <span class="n">total</span> <span class="n">header</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">54</span> <span class="n">bytes</span>
+    <span class="n">aHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iFileSize</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iFileSize</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iFileSize</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iFileSize</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iFileSize</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iFileSize</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iFileSize</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iFileSize</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iFileSize</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iFileSize</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span>
+
+    <span class="n">aHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="sr"> // reserved</span>
+<span class="sr">    aHeader.push(0);</span>
+<span class="sr">    aHeader.push(0); /</span><span class="o">/</span> <span class="n">reserved</span>
+    <span class="n">aHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+    <span class="n">aHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">54</span><span class="p">);</span><span class="sr"> // dataoffset</span>
+<span class="sr">    aHeader.push(0);</span>
+<span class="sr">    aHeader.push(0);</span>
+<span class="sr">    aHeader.push(0);</span>
+
+<span class="sr">    var aInfoHeader = [];</span>
+<span class="sr">    aInfoHeader.push(40); /</span><span class="o">/</span> <span class="n">info</span> <span class="n">header</span> <span class="n">size</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+    <span class="n">var</span> <span class="n">iImageWidth</span> <span class="o">=</span> <span class="n">iWidth</span><span class="p">;</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iImageWidth</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iImageWidth</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iImageWidth</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iImageWidth</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iImageWidth</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iImageWidth</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iImageWidth</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iImageWidth</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iImageWidth</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iImageWidth</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span>
+  
+    <span class="n">var</span> <span class="n">iImageHeight</span> <span class="o">=</span> <span class="n">iHeight</span><span class="p">;</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iImageHeight</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iImageHeight</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iImageHeight</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iImageHeight</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iImageHeight</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iImageHeight</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iImageHeight</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iImageHeight</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iImageHeight</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iImageHeight</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span>
+  
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="sr"> // num of planes</span>
+<span class="sr">    aInfoHeader.push(0);</span>
+<span class="sr">  </span>
+<span class="sr">    aInfoHeader.push(24); /</span><span class="o">/</span> <span class="n">num</span> <span class="n">of</span> <span class="n">bits</span> <span class="n">per</span> <span class="n">pixel</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="sr"> // compression = none</span>
+<span class="sr">    aInfoHeader.push(0);</span>
+<span class="sr">    aInfoHeader.push(0);</span>
+<span class="sr">    aInfoHeader.push(0);</span>
+<span class="sr">  </span>
+<span class="sr">    var iDataSize = iWidth*iHeight*3; </span>
+<span class="sr">    aInfoHeader.push(iDataSize % 256); iDataSize = Math.floor(iDataSize /</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iDataSize</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iDataSize</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iDataSize</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iDataSize</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> <span class="n">iDataSize</span> <span class="o">=</span> <span class="no">Math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iDataSize</span> <span class="o">/</span> <span class="mi">256</span><span class="p">);</span>
+    <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">iDataSize</span> <span class="o">%</span> <span class="mi">256</span><span class="p">);</span> 
+  
+    <span class="k">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">16</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">aInfoHeader</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="sr">	// these bytes not used</span>
+<span class="sr">    }</span>
+<span class="sr">  </span>
+<span class="sr">    var iPadding = (4 - ((iWidth * 3) % 4)) % 4;</span>
+
+<span class="sr">    var aImgData = oData.data;</span>
+
+<span class="sr">    var strPixelData = &quot;&quot;;</span>
+<span class="sr">    var y = iHeight;</span>
+<span class="sr">    do {</span>
+<span class="sr">      var iOffsetY = iWidth*(y-1)*4;</span>
+<span class="sr">      var strPixelRow = &quot;&quot;;</span>
+<span class="sr">      for (var x=0;x&lt;iWidth;x++) {</span>
+<span class="sr">        var iOffsetX = 4*x;</span>
+
+<span class="sr">        strPixelRow += String.fromCharCode(aImgData[iOffsetY+iOffsetX+2]);</span>
+<span class="sr">        strPixelRow += String.fromCharCode(aImgData[iOffsetY+iOffsetX+1]);</span>
+<span class="sr">        strPixelRow += String.fromCharCode(aImgData[iOffsetY+iOffsetX]);</span>
+<span class="sr">      }</span>
+<span class="sr">      for (var c=0;c&lt;iPadding;c++) {</span>
+<span class="sr">        strPixelRow += String.fromCharCode(0);</span>
+<span class="sr">      }</span>
+<span class="sr">      strPixelData += strPixelRow;</span>
+<span class="sr">    } while (--y);</span>
+
+<span class="sr">    var strEncoded = encodeData(aHeader.concat(aInfoHeader)) + encodeData(strPixelData);</span>
+
+<span class="sr">    return strEncoded;</span>
+<span class="sr">  }</span>
+
+
+<span class="sr">  /</span><span class="o">/</span> <span class="n">sends</span> <span class="n">the</span> <span class="n">generated</span> <span class="n">file</span> <span class="n">to</span> <span class="n">the</span> <span class="n">client</span>
+  <span class="n">var</span> <span class="n">saveFile</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">strData</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">document</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">href</span> <span class="o">=</span> <span class="n">strData</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">var</span> <span class="n">makeDataURI</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">strData</span><span class="p">,</span> <span class="n">strMime</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s2">&quot;data:&quot;</span> <span class="o">+</span> <span class="n">strMime</span> <span class="o">+</span> <span class="s2">&quot;;base64,&quot;</span> <span class="o">+</span> <span class="n">strData</span><span class="p">;</span>
+  <span class="p">}</span><span class="sr"></span>
+
+<span class="sr">  // generates a &lt;img&gt; object containing the imagedata</span>
+<span class="sr">  var makeImageObject = function(strSource) {</span>
+<span class="sr">    var oImgElement = document.createElement(&quot;img&quot;);</span>
+<span class="sr">    oImgElement.src = strSource;</span>
+<span class="sr">    return oImgElement;</span>
+<span class="sr">  }</span>
+
+<span class="sr">  var scaleCanvas = function(oCanvas, iWidth, iHeight) {</span>
+<span class="sr">    if (iWidth &amp;&amp; iHeight) {</span>
+<span class="sr">      var oSaveCanvas = document.createElement(&quot;canvas&quot;);</span>
+<span class="sr">      oSaveCanvas.width = iWidth;</span>
+<span class="sr">      oSaveCanvas.height = iHeight;</span>
+<span class="sr">      oSaveCanvas.style.width = iWidth+&quot;px&quot;;</span>
+<span class="sr">      oSaveCanvas.style.height = iHeight+&quot;px&quot;;</span>
+
+<span class="sr">      var oSaveCtx = oSaveCanvas.getContext(&quot;2d&quot;);</span>
+
+<span class="sr">      oSaveCtx.drawImage(oCanvas, 0, 0, oCanvas.width, oCanvas.height, 0, 0, iWidth, iHeight);</span>
+<span class="sr">      return oSaveCanvas;</span>
+<span class="sr">    }</span>
+<span class="sr">    return oCanvas;</span>
+<span class="sr">  }</span>
+
+<span class="sr">  return {</span>
+
+<span class="sr">    saveAsPNG : function(oCanvas, bReturnImg, iWidth, iHeight) {</span>
+<span class="sr">      if (!bHasDataURL) {</span>
+<span class="sr">        return false;</span>
+<span class="sr">      }</span>
+<span class="sr">      var oScaledCanvas = scaleCanvas(oCanvas, iWidth, iHeight);</span>
+<span class="sr">      var strData = oScaledCanvas.toDataURL(&quot;image/</span><span class="n">png</span><span class="s2">&quot;);</span>
+<span class="s2">      if (bReturnImg) {</span>
+<span class="s2">        return makeImageObject(strData);</span>
+<span class="s2">      } else {</span>
+<span class="s2">        saveFile(strData.replace(&quot;</span><span class="n">image</span><span class="o">/</span><span class="n">png</span><span class="s2">&quot;, strDownloadMime));</span>
+<span class="s2">      }</span>
+<span class="s2">      return true;</span>
+<span class="s2">    },</span>
+
+<span class="s2">    saveAsJPEG : function(oCanvas, bReturnImg, iWidth, iHeight) {</span>
+<span class="s2">      if (!bHasDataURL) {</span>
+<span class="s2">        return false;</span>
+<span class="s2">      }</span>
+
+<span class="s2">      var oScaledCanvas = scaleCanvas(oCanvas, iWidth, iHeight);</span>
+<span class="s2">      var strMime = &quot;</span><span class="n">image</span><span class="o">/</span><span class="n">jpeg</span><span class="s2">&quot;;</span>
+<span class="s2">      var strData = oScaledCanvas.toDataURL(strMime);</span>
+<span class="s2">  </span>
+<span class="s2">      // check if browser actually supports jpeg by looking for the mime type in the data uri.</span>
+<span class="s2">      // if not, return false</span>
+<span class="s2">      if (strData.indexOf(strMime) != 5) {</span>
+<span class="s2">        return false;</span>
+<span class="s2">      }</span>
+
+<span class="s2">      if (bReturnImg) {</span>
+<span class="s2">        return makeImageObject(strData);</span>
+<span class="s2">      } else {</span>
+<span class="s2">        saveFile(strData.replace(strMime, strDownloadMime));</span>
+<span class="s2">      }</span>
+<span class="s2">      return true;</span>
+<span class="s2">    },</span>
+
+<span class="s2">    saveAsBMP : function(oCanvas, bReturnImg, iWidth, iHeight) {</span>
+<span class="s2">      if (!(bHasImageData &amp;&amp; bHasBase64)) {</span>
+<span class="s2">        return false;</span>
+<span class="s2">      }</span>
+
+<span class="s2">      var oScaledCanvas = scaleCanvas(oCanvas, iWidth, iHeight);</span>
+
+<span class="s2">      var oData = readCanvasData(oScaledCanvas);</span>
+<span class="s2">      var strImgData = createBMP(oData);</span>
+<span class="s2">      if (bReturnImg) {</span>
+<span class="s2">        return makeImageObject(makeDataURI(strImgData, &quot;</span><span class="n">image</span><span class="o">/</span><span class="n">bmp</span><span class="s2">&quot;));</span>
+<span class="s2">      } else {</span>
+<span class="s2">        saveFile(makeDataURI(strImgData, strDownloadMime));</span>
+<span class="s2">      }</span>
+<span class="s2">      return true;</span>
+<span class="s2">    }</span>
+<span class="s2">  };</span>
+
+<span class="s2">})();</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

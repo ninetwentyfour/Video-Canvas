@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>base64.js</title>
+  <link rel="stylesheet" href="http://github.com/jashkenas/docco/raw/0.3.0/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="base64.html">base64.js</a>
+          <a class="source" href="canvas2image.html">canvas2image.js</a>
+          <a class="source" href="excanvas.html">excanvas.js</a>
+          <a class="source" href="jquery.ghindaVideoPlayer.html">jquery.ghindaVideoPlayer.js</a>
+          <a class="source" href="text.html">text.js</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>base64.js</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="sr">/* Copyright (C) 1999 Masanao Izumo &lt;iz@onicos.co.jp&gt;</span>
+<span class="sr"> * Version: 1.0</span>
+<span class="sr"> * LastModified: Dec 25 1999</span>
+<span class="sr"> * This library is free.  You can redistribute it and/o</span><span class="n">r</span> <span class="n">modify</span> <span class="n">it</span><span class="o">.</span>
+ <span class="o">*/</span><span class="sr"></span>
+
+<span class="sr">/*</span>
+<span class="sr"> * Interfaces:</span>
+<span class="sr"> * b64 = base64encode(data);</span>
+<span class="sr"> * data = base64decode(b64);</span>
+<span class="sr"> */</span>
+
+<span class="p">(</span><span class="n">function</span><span class="p">()</span> <span class="p">{</span>
+
+<span class="n">var</span> <span class="n">base64EncodeChars</span> <span class="o">=</span> <span class="s2">&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;</span><span class="p">;</span>
+<span class="n">var</span> <span class="n">base64DecodeChars</span> <span class="o">=</span> <span class="kp">new</span> <span class="nb">Array</span><span class="p">(</span>
+    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span>
+    <span class="mi">52</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">38</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span>
+    <span class="mi">41</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="n">function</span> <span class="n">base64encode</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">out</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">len</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">;</span>
+
+    <span class="n">len</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">length</span><span class="p">;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">c1</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">charCodeAt</span><span class="p">(</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">len</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">(</span><span class="n">c1</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">((</span><span class="n">c1</span> <span class="o">&amp;</span> <span class="mh">0x3</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">);</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;==&quot;</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">c2</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">charCodeAt</span><span class="p">(</span><span class="n">i</span><span class="o">++</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">len</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">(</span><span class="n">c1</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">(((</span><span class="n">c1</span> <span class="o">&amp;</span> <span class="mh">0x3</span><span class="p">)</span><span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">c2</span> <span class="o">&amp;</span> <span class="mh">0xF0</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">));</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">((</span><span class="n">c2</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;=&quot;</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">c3</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">charCodeAt</span><span class="p">(</span><span class="n">i</span><span class="o">++</span><span class="p">);</span>
+  <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">(</span><span class="n">c1</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">(((</span><span class="n">c1</span> <span class="o">&amp;</span> <span class="mh">0x3</span><span class="p">)</span><span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">c2</span> <span class="o">&amp;</span> <span class="mh">0xF0</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">));</span>
+  <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">(((</span><span class="n">c2</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">c3</span> <span class="o">&amp;</span> <span class="mh">0xC0</span><span class="p">)</span> <span class="o">&gt;&gt;</span><span class="mi">6</span><span class="p">));</span>
+  <span class="n">out</span> <span class="o">+=</span> <span class="n">base64EncodeChars</span><span class="o">.</span><span class="n">charAt</span><span class="p">(</span><span class="n">c3</span> <span class="o">&amp;</span> <span class="mh">0x3F</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">out</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">function</span> <span class="n">base64decode</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">c4</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">i</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="n">out</span><span class="p">;</span>
+
+    <span class="n">len</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">length</span><span class="p">;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span><span class="sr"></span>
+<span class="sr">  /* c1 */</span>
+  <span class="k">do</span> <span class="p">{</span>
+      <span class="n">c1</span> <span class="o">=</span> <span class="n">base64DecodeChars</span><span class="o">[</span><span class="n">str</span><span class="o">.</span><span class="n">charCodeAt</span><span class="p">(</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="o">]</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">c1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">c1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">break</span><span class="p">;</span><span class="sr"></span>
+
+<span class="sr">  /* c2 */</span>
+  <span class="k">do</span> <span class="p">{</span>
+      <span class="n">c2</span> <span class="o">=</span> <span class="n">base64DecodeChars</span><span class="o">[</span><span class="n">str</span><span class="o">.</span><span class="n">charCodeAt</span><span class="p">(</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="o">]</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">c2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">c2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">break</span><span class="p">;</span>
+
+  <span class="n">out</span> <span class="o">+=</span> <span class="nb">String</span><span class="o">.</span><span class="n">fromCharCode</span><span class="p">((</span><span class="n">c1</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">c2</span> <span class="o">&amp;</span> <span class="mh">0x30</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">));</span><span class="sr"></span>
+
+<span class="sr">  /* c3 */</span>
+  <span class="k">do</span> <span class="p">{</span>
+      <span class="n">c3</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">charCodeAt</span><span class="p">(</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">;</span>
+      <span class="k">if</span><span class="p">(</span><span class="n">c3</span> <span class="o">==</span> <span class="mi">61</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span><span class="p">;</span>
+      <span class="n">c3</span> <span class="o">=</span> <span class="n">base64DecodeChars</span><span class="o">[</span><span class="n">c3</span><span class="o">]</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">c3</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">c3</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">break</span><span class="p">;</span>
+
+  <span class="n">out</span> <span class="o">+=</span> <span class="nb">String</span><span class="o">.</span><span class="n">fromCharCode</span><span class="p">(((</span><span class="n">c2</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="no">XF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">c3</span> <span class="o">&amp;</span> <span class="mh">0x3C</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">));</span><span class="sr"></span>
+
+<span class="sr">  /* c4 */</span>
+  <span class="k">do</span> <span class="p">{</span>
+      <span class="n">c4</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">charCodeAt</span><span class="p">(</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">;</span>
+      <span class="k">if</span><span class="p">(</span><span class="n">c4</span> <span class="o">==</span> <span class="mi">61</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span><span class="p">;</span>
+      <span class="n">c4</span> <span class="o">=</span> <span class="n">base64DecodeChars</span><span class="o">[</span><span class="n">c4</span><span class="o">]</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">c4</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">c4</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">break</span><span class="p">;</span>
+  <span class="n">out</span> <span class="o">+=</span> <span class="nb">String</span><span class="o">.</span><span class="n">fromCharCode</span><span class="p">(((</span><span class="n">c3</span> <span class="o">&amp;</span> <span class="mh">0x03</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span><span class="p">)</span> <span class="o">|</span> <span class="n">c4</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">out</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">window</span><span class="o">.</span><span class="n">btoa</span><span class="p">)</span> <span class="n">window</span><span class="o">.</span><span class="n">btoa</span> <span class="o">=</span> <span class="n">base64encode</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">window</span><span class="o">.</span><span class="n">atob</span><span class="p">)</span> <span class="n">window</span><span class="o">.</span><span class="n">atob</span> <span class="o">=</span> <span class="n">base64decode</span><span class="p">;</span>
+
+<span class="p">})();</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
