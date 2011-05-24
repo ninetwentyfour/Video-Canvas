@@ -1,77 +1,112 @@
+<!-- 
+References:
+	http://html5doctor.com/video-canvas-magic/
+	http://www.nihilogic.dk/labs/canvas2image/
+	http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/
+	http://dev.opera.com/articles/view/custom-html5-video-player-with-css3-and-jquery/
+	http://www.lutzroeder.com/html5/
+	http://jim.studt.net/canvastext/
+	http://mrdoob.com/projects/multiuserpad/
+-->
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
-
-  <title>ninetwentyfour/Video-Canvas @ GitHub</title>
-
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #b21fde;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #4de021; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #4de021; }
-    h3 { text-align: center; color: #4de021; }
-    a { color: #4de021; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+	<style>
+		body {
+			background: #111;
+			color:#eee;
+		}
+		#c {
+			width: 640px;
+			height: 360px;
+			float: left;
+		}
+		#v {
+			display:none;
+			width:640px;
+			height:360px;
+		}
+		#main{
+			width:650px;
+			margin:auto;
+		}
+		.toolList{
+			float:left;
+			width:100%;
+		}
+	</style>
+	<link href="css/ghindaVideoPlayer.css" rel="stylesheet" type="text/css">
 </head>
-
 <body>
-  <a href="http://github.com/ninetwentyfour/Video-Canvas"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-
-  <div id="container">
-
-    <div class="download">
-      <a href="http://github.com/ninetwentyfour/Video-Canvas/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/ninetwentyfour/Video-Canvas/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-
-    <h1><a href="http://github.com/ninetwentyfour/Video-Canvas">Video-Canvas</a>
-      <span class="small">by <a href="http://github.com/ninetwentyfour">ninetwentyfour</a></span></h1>
-
-    <div class="description">
-      Video player that you can write on
-    </div>
-
-    <h2>Authors</h2>
-<p>Travis (tberry@biemedia.com)<br/>Travis Berry (travisberry@travisberry.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Travis Berry (contact@travisberry.com)<br/>      </p>
-
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/ninetwentyfour/Video-Canvas/zipball/master">zip</a> or
-      <a href="http://github.com/ninetwentyfour/Video-Canvas/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/ninetwentyfour/Video-Canvas</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/ninetwentyfour/Video-Canvas">ninetwentyfour/Video-Canvas</a>
-    </div>
-
-  </div>
-
-  
+	<div id="main">
+		<span id="testText">Video Write-On Annotations</span>
+		<canvas id="c"></canvas><!-- the canvas -->
+		<video width="640" height="360" autobuffer="true" controls="true" poster="http://www.travisberry.com/html5video/videos/demo/demoani1-poster.jpg" id="v" tabindex="0">
+			<source src="videos/sintel-trailer.ogv" type='video/ogg; codecs="theora, vorbis"'>
+			<source src="videos/sintel-trailer.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+		</video>
+		<!-- The video controls-->
+		<div class="ghinda-video-controls">
+			<a class="ghinda-video-play" title="Play/Pause"></a>
+			<div class="ghinda-video-seek"></div>
+			<!-- <div class="ghinda-video-timer">00:00</div> -->
+			<div class="ghinda-volume-box">
+				<div class="ghinda-volume-slider"></div>
+				<a class="ghinda-volume-button" title="Mute/Unmute"></a>
+			</div>
+		</div>
+		<!-- Draw controls -->
+		<ul class="toolList">
+			<li>Clear the canvas: <button type="button" id="clearCanvas">Clear</button></li>
+			<li><span class="highlight">Choose a color: </span><button type="button" id="choosePurpleColors">Purple</button><button type="button" id="chooseGreenColors">Green</button><button type="button" id="chooseYellowColors">Yellow</button><button type="button" id="chooseBrownColors">Brown</button></li>
+			<li><span class="highlight">Choose a size: </span><button type="button" id="chooseSmallSizes">Small</button><button type="button" id="chooseNormalSizes">Normal</button><button type="button" id="chooseLargeSizes">Large</button><button type="button" id="chooseHugeSizes">Huge</button></li>
+			<li><button type="button" id="chooseWhiteColors">Eraser</button></li>
+			<li><button type="button" id="chooseWhiteColors" onclick="writeText();">Text</button></li>
+		</ul>
+		<!-- Save image-->
+		<div style="display: block; float:left;" id="buttoncontainer">
+			<input type="button" value="Save PNG" id="savepngbtn">
+			<input type="button" value="Convert to PNG" id="convertpngbtn">
+			<br>
+			<input type="button" value="Save BMP" id="savebmpbtn">
+			<input type="button" value="Convert to BMP" id="convertbmpbtn">
+			<br>
+			<input type="button" value="Save JPEG" id="savejpegbtn">
+			<input type="button" value="Convert to JPEG" id="convertjpegbtn">
+		</div>
+		<div style="display: none; font-style: italic;" id="textdownload">Now you can right click and download the image<br>
+			<input type="button" value="Reset" id="resetbtn">
+		</div>
+	</div><!-- End #main -->
+	
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script><!-- Needed by player controls-->
+	<script type="text/javascript" src="js/canvas2image.min.js"></script><!-- Needed to save image to desktop-->
+	<script type="text/javascript" src="js/base64.min.js"></script><!-- Needed to save image to desktop-->
+	<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+	<script type="text/javascript" src="js/videoToCanvas.min.js"></script><!-- play video in canvas -->
+	<script type="text/javascript" src="js/canvasDraw.min.js"></script><!-- draw in the canvas -->
+	<script src="js/jquery.ghindaVideoPlayer.min.js"></script><!-- Player controls script-->
+	<script>
+		//instantiate player controls
+		$(function() {
+			$('#v').gVideo();
+		});
+	</script>
+	<script type="text/javascript" src="js/saveImage.min.js"></script><!-- save images -->
+	<script type="text/javascript" src="js/text.min.js"></script><!-- Library to help text -->
+	<script type="text/javascript" src="js/addText.min.js"></script><!-- Add text to canvas -->
+	<script type="text/javascript">
+		//load the poster image
+		$(window).load(function () {
+			var canvas = document.getElementById("c");
+			var context = canvas.getContext("2d");
+			// create a new "image" set the source the same as the poster attr in the video
+			var poster = new Image();
+			poster.src = $('video').attr('poster');
+			//draw the "image" to the canvas
+			context.drawImage(poster, 0, 0);
+		});
+	</script>
 </body>
 </html>
